@@ -10,6 +10,7 @@ function App() {
       <Route path="/register" element={<RegisterationForm />} />
       <Route path="/login" element={<LoginForm />} />
       <Route
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <Dashboar />
