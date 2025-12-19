@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
 
     try {
-      const response = await apiConfig.post("/logout");
+      const response = await apiConfig.post("auth/logout");
       setUser(null);
       setIsVerified(false);
     } catch (err) {
