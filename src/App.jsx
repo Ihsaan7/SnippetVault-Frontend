@@ -1,14 +1,23 @@
-import { useState } from "react";
-
+import { Routes, Route } from "react-router-dom";
+import { RegisterationForm } from "./components/auth/RegisterationForm";
+import { LoginForm } from "./components/auth/LoginForm";
+import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <h1 className="border-2 ">Am working</h1>
-    </>
+    <Routes>
+      <Route path="/register" element={<RegisterationForm />} />
+      <Route path="/login" element={<LoginForm />} />
+      <Route
+        element={
+          <ProtectedRoute>
+            <Dashboar />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 
