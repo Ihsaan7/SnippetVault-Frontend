@@ -1,8 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { RegisterationForm } from "./components/auth/RegisterationForm";
 import { LoginForm } from "./components/auth/LoginForm";
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import "./App.css";
+import { Dashboard } from "./components/dashboard/Dashboard";
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboar />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
