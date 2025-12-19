@@ -8,11 +8,23 @@ const apiConfig = axios.create({
 apiConfig.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response?.status === 401) {
-      if (window.location.href !== "/login") {
-        window.location.href = "/login";
+    const status = error.response?.status;
+
+    // This is the endpoint being called (ex: "/auth/login")
+    const requestUrl = error.config?.url || "";
+
+    // 1) Don't redirect on login/register failures (otherwise your error flashes then page reloads)
+    const isAuthRequest =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register");
+
+    if (status === 401 && !isAuthRequest) {
+      // 2) Use pathname ("/login") instead of full href ("http://localhost:5173/login")
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login"; // you can keep href; main fix is the conditions above
       }
     }
+
     return Promise.reject(error);
   }
 );
