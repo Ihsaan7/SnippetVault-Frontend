@@ -6,6 +6,7 @@ import "./App.css";
 import { Dashboard } from "./pages/Dashboard";
 import SnippetCreate from "./pages/SnippetCreate";
 import { Snippets } from "./pages/Snippets";
+import SnippetEdit from "./pages/SnippetEdit";
 
 function App() {
   return (
@@ -33,6 +34,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Snippets />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/snippets/:id/edit"
+        element={
+          <ProtectedRoute>
+            <SnippetEdit />
           </ProtectedRoute>
         }
       />

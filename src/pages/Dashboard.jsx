@@ -14,9 +14,14 @@ export function Dashboard() {
     navigate("/login");
   };
 
-  const handleSnippet = (e) => {
+  const handleSnippetCreate = (e) => {
     e.preventDefault();
     navigate("/dashboard/create");
+  };
+
+  const handleSnippet = (e) => {
+    e.preventDefault();
+    navigate("/dashboard/snippets");
   };
 
   return (
@@ -26,7 +31,8 @@ export function Dashboard() {
       <button onClick={handleLogout} disabled={isLoading}>
         {isLoading ? "Logging Out..." : "Log Out"}
       </button>
-      <button onClick={handleSnippet}>New Snippet</button>
+      <button onClick={handleSnippet}>Show all snippets</button>
+      <button onClick={handleSnippetCreate}>New Snippet</button>
       <div>
         <p>Total snippets: {snippets?.length || 0}</p>
       </div>
