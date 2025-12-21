@@ -1,0 +1,122 @@
+import { useState, createContext, useContext } from "react";
+import apiConfig from "../utils/axios";
+
+const SnippetContext = createContext();
+
+export const SnippetProvider = ({ children }) => {
+  const [snippets, setSnippets] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const createSnippet = async (formData) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiConfig.post("/snippets/create", formData);
+      if (response && response.data && response.data.data) {
+        setSnippets([response.data.data, ...snippets]);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Creating snippet failed!");
+      console.error("FRONTEND_CREATE_CONTEXT");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getSnippets = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiConfig.get("/snippets");
+      if (response && response.data && response.data.data.snippets) {
+        setSnippets(response.data.data.snippets);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Snippet fetching failed!");
+      console.error("FRONTEND_FETCHING-ALL_CONTEXT");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getSnippetByID = async (snippetID) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiConfig.get(`/snippets/${snippetID}`);
+      if (response && response.data && response.data.data) {
+        return response.data.data;
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "SnippetByID fetching failed!");
+      console.error("FRONTEND_FETCHING-BY-ID_CONTEXT");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateSnippet = async (snippetID, formData) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiConfig.put(`/snippets/${snippetID}`, formData);
+      if (response && response.data && response.data.data) {
+        setSnippets(
+          snippets.map((s) => (s._id === snippetID ? response.data.data : s))
+        );
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Update snippet failed!");
+      console.error("FRONTEND_UPDATE_CONTEXT");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteSnippet = async (snippetID) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiConfig.delete(`/snippets/${snippetID}`);
+      if (response && response.data && response.data.success) {
+        setSnippets(snippets.filter((s) => s._id !== snippetID));
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Deleting snippet failed!");
+      console.error("FRONTEND_DELETE_CONTEXT");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <SnippetContext.Provider
+      value={{
+        snippets,
+        isLoading,
+        error,
+        createSnippet,
+        getSnippetByID,
+        getSnippets,
+        updateSnippet,
+        deleteSnippet,
+      }}
+    >
+      {children}
+    </SnippetContext.Provider>
+  );
+};
+
+export const useSnippet = () => {
+  const context = useContext(SnippetContext);
+  if (!context) {
+    throw new Error("useSnippet must be used within SnippetProvider");
+  }
+  return context;
+};
