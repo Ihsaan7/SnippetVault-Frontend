@@ -5,7 +5,6 @@ import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import "./App.css";
 import { Dashboard } from "./pages/Dashboard";
 import SnippetCreate from "./pages/SnippetCreate";
-import Snippet from "../../Server/src/models/Snippet.model";
 import { Snippets } from "./pages/Snippets";
 
 function App() {

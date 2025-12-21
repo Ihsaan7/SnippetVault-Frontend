@@ -7,7 +7,22 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // start loading until we hydrate
+
+  // Rehydrate auth state from localStorage on first load
+  useEffect(() => {
+    const storedUser = localStorage.getItem("sv_user");
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+        setIsVerified(true);
+      } catch (e) {
+        localStorage.removeItem("sv_user");
+      }
+    }
+    setIsLoading(false);
+  }, []);
 
   const register = async (formData) => {
     setIsLoading(true);
@@ -18,6 +33,10 @@ export const AuthProvider = ({ children }) => {
       if (response && response.data && response.data.data.user) {
         setUser(response.data.data.user);
         setIsVerified(true);
+        localStorage.setItem(
+          "sv_user",
+          JSON.stringify(response.data.data.user)
+        );
       }
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -37,6 +56,10 @@ export const AuthProvider = ({ children }) => {
       if (response && response.data && response.data.data.user) {
         setUser(response.data.data.user);
         setIsVerified(true);
+        localStorage.setItem(
+          "sv_user",
+          JSON.stringify(response.data.data.user)
+        );
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login Failed");
@@ -55,6 +78,7 @@ export const AuthProvider = ({ children }) => {
       const response = await apiConfig.post("auth/logout");
       setUser(null);
       setIsVerified(false);
+      localStorage.removeItem("sv_user");
     } catch (err) {
       setError(err.response?.data?.message || "Logout Failed");
       console.error("FRONTEND_LOGOUT!!!");
