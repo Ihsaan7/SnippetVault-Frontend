@@ -4,12 +4,15 @@ import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
+import { SnippetProvider } from "./context/SnippetContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <SnippetProvider>
+          <App />
+        </SnippetProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
