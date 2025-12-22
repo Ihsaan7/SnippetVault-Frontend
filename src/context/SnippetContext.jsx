@@ -7,6 +7,12 @@ export const SnippetProvider = ({ children }) => {
   const [snippets, setSnippets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 6,
+    totalPages: 1,
+  });
 
   const createSnippet = async (formData) => {
     setIsLoading(true);
@@ -25,14 +31,19 @@ export const SnippetProvider = ({ children }) => {
     }
   };
 
-  const getSnippets = async () => {
+  const getSnippets = async ({ page = 1, limit = 6, search = "" } = {}) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await apiConfig.get("/snippets");
+      const response = await apiConfig.get("/snippets", {
+        params: { page, limit, search },
+      });
       if (response && response.data && response.data.data.snippets) {
         setSnippets(response.data.data.snippets);
+        if (response.data.data.pagination) {
+          setPagination(response.data.data.pagination);
+        }
       }
     } catch (err) {
       setError(err.response?.data?.message || "Snippet fetching failed!");
@@ -98,6 +109,7 @@ export const SnippetProvider = ({ children }) => {
   return (
     <SnippetContext.Provider
       value={{
+        pagination,
         snippets,
         isLoading,
         error,
