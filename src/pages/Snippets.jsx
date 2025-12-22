@@ -8,13 +8,14 @@ export function Snippets() {
     useSnippet();
   const { totalPages = 1 } = pagination || {};
   const [page, setPage] = useState(1);
-  const [limit] = useState(6);
+  const [limit, setLimit] = useState(6);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    getSnippets();
     const timer = setTimeout(() => {
-      getSnippets({ page, limit, search });
+      getSnippets(page, limit, search);
     }, 300);
 
     return () => {
