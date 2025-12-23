@@ -7,6 +7,7 @@ import { Dashboard } from "./pages/Dashboard";
 import SnippetCreate from "./pages/SnippetCreate";
 import { Snippets } from "./pages/Snippets";
 import SnippetEdit from "./pages/SnippetEdit";
+import { Profile } from "./pages/Profile";
 
 function App() {
   return (
@@ -21,6 +22,17 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route />
+
+      <Route
+        path="/dashboard/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/dashboard/create"
         element={

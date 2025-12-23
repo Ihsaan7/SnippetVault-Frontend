@@ -7,7 +7,9 @@ export function RegisterationForm() {
     username: "",
     email: "",
     password: "",
+    fullName: "",
   });
+  const [avatarFile, setAvatarFile] = useState(null);
   const { isLoading, register, error } = useAuth();
   const navigate = useNavigate();
 
@@ -20,7 +22,18 @@ export function RegisterationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(formData);
+
+    // Create FormData to include avatar file
+    const submitData = new FormData();
+    submitData.append("username", formData.username);
+    submitData.append("email", formData.email);
+    submitData.append("password", formData.password);
+    submitData.append("fullName", formData.fullName);
+    if (avatarFile) {
+      submitData.append("avatar", avatarFile);
+    }
+
+    await register(submitData);
 
     if (!error) {
       navigate("/dashboard");
@@ -50,6 +63,27 @@ export function RegisterationForm() {
               id="username"
               name="username"
               value={formData.username}
+              onChange={handleChange}
+              required
+              disabled={isLoading} // Use local state here
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              placeholder="johndoe123"
+            />
+          </div>
+
+          {/* FullName Input */}
+          <div>
+            <label
+              htmlFor="fullName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              value={formData.fullName}
               onChange={handleChange}
               required
               disabled={isLoading} // Use local state here
@@ -101,6 +135,28 @@ export function RegisterationForm() {
             />
             <p className="text-xs text-gray-500 mt-1">
               Must be at least 6 characters
+            </p>
+          </div>
+
+          {/* Avatar Input */}
+          <div>
+            <label
+              htmlFor="avatar"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Profile Picture
+            </label>
+            <input
+              type="file"
+              id="avatar"
+              accept="image/*"
+              onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+              required
+              disabled={isLoading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400 text-sm"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Upload an image file for your profile
             </p>
           </div>
 

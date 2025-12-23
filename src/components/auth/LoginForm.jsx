@@ -97,6 +97,8 @@ export function LoginForm() {
           >
             {isLoading ? "Logging In..." : "Login"}
           </button>
+          <p>New user! Create account!</p>
+          <button onClick={() => navigate("/register")}>REGISTER</button>
         </form>
       </div>
     </div>
