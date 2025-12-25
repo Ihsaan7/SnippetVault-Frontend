@@ -1,27 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSnippet } from "../../context/SnippetContext";
 
-export function SnippetForm({ onSuccess }) {
+export function SnippetForm({ onSuccess, initialValues }) {
   const [formData, setFormData] = useState({
-    title: "",
-    code: "",
-    codeLanguage: "javascript",
-    tags: "",
-    description: "",
-    isPublic: false,
+    title: initialValues?.title || "",
+    code: initialValues?.code || "",
+    codeLanguage: initialValues?.codeLanguage || "javascript",
+    description: initialValues?.description || "",
+    isPublic: initialValues?.isPublic || false,
   });
+  const [tags, setTags] = useState(initialValues?.tags || []);
+  const [tagInput, setTagInput] = useState("");
   const { isLoading, error, createSnippet } = useSnippet();
+
+  useEffect(() => {
+    if (initialValues?.tags?.length) {
+      setTags([
+        ...new Set(initialValues.tags.map((t) => t.toLowerCase().trim())),
+      ]);
+    }
+  }, [initialValues]);
+
+  const sanitizeTag = (t) => t.toLowerCase().trim();
+  const addTag = (raw) => {
+    const tag = sanitizeTag(raw);
+    if (!tag) return;
+    if (tags.includes(tag)) return;
+    if (tags.length >= 10) return; // max 10 tags
+    setTags((prev) => [...prev, tag]);
+  };
+  const removeTag = (tag) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  };
+  const onTagKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag(tagInput);
+      setTagInput("");
+    }
+  };
+  const onTagBlur = () => {
+    if (tagInput.trim()) {
+      addTag(tagInput);
+      setTagInput("");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const tagsArray = formData.tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
 
     const payload = {
       ...formData,
-      tags: tagsArray,
+      tags,
     };
 
     await createSnippet(payload);
@@ -84,24 +114,42 @@ export function SnippetForm({ onSuccess }) {
             />
           </div>
 
-          {/* Tags Input */}
+          {/* Tags Input (chips) */}
           <div>
-            <label
-              htmlFor="tags"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Tags (comma separated)
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tags
             </label>
             <input
               type="text"
-              id="tags"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={onTagKeyDown}
+              onBlur={onTagBlur}
               disabled={isLoading}
+              placeholder="Type a tag and press Enter"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100"
-              placeholder="backend, auth, node"
             />
+            <div className="mt-2 flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center rounded-full bg-blue-100 text-blue-700 px-3 py-1 text-xs"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="ml-2 text-blue-700 hover:text-blue-900"
+                    aria-label={`Remove ${tag}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Up to 10 tags. Press Enter to add.
+            </p>
           </div>
         </div>
 
