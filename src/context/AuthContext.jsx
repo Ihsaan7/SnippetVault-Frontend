@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import apiConfig from "../utils/axios";
 
@@ -17,7 +18,7 @@ export const AuthProvider = ({ children }) => {
         const parsed = JSON.parse(storedUser);
         setUser(parsed);
         setIsVerified(true);
-      } catch (e) {
+      } catch {
         localStorage.removeItem("sv_user");
       }
     }
@@ -75,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
 
     try {
-      const response = await apiConfig.post("auth/logout");
+      await apiConfig.post("auth/logout");
       setUser(null);
       setIsVerified(false);
       localStorage.removeItem("sv_user");

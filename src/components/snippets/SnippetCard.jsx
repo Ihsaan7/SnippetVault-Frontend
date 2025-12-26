@@ -1,10 +1,13 @@
 import { useRef } from "react";
+import { CodeBlock } from "../code/CodeBlock";
 
 export default function SnippetCard({
   snippet,
   onEdit,
   onDelete,
   onTagLongPress,
+  onFavorite,
+  editLabel = "Edit",
 }) {
   const longPressTimeout = useRef(null);
   const longPressedRef = useRef(false);
@@ -17,6 +20,9 @@ export default function SnippetCard({
     description = "",
     code = "",
     createdAt,
+    isPublic,
+    isFavorited,
+    favoriteCount,
   } = snippet;
 
   const tagList = Array.isArray(tags) ? tags : [];
@@ -56,9 +62,11 @@ export default function SnippetCard({
         <p className="text-slate-300 mt-2 text-sm">{description}</p>
       )}
 
-      <pre className="mt-3 bg-slate-900 text-slate-200 rounded p-3 text-xs overflow-x-auto">
-        <code>{preview}</code>
-      </pre>
+      <CodeBlock
+        code={preview}
+        language={codeLanguage}
+        className="mt-3 bg-slate-900 text-slate-200 rounded p-3 text-xs overflow-x-auto"
+      />
 
       {tagList.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -81,13 +89,52 @@ export default function SnippetCard({
         </div>
       )}
 
-      <div className="flex gap-2 justify-end mt-3">
+      <div className="flex gap-2 justify-end mt-3 flex-wrap">
+        {typeof favoriteCount === "number" && (
+          <span className="mr-auto text-xs text-slate-400 self-center">
+            Favorites: {favoriteCount}
+          </span>
+        )}
+
+        {isPublic && (
+          <button
+            type="button"
+            onClick={async () => {
+              const url = `${window.location.origin}/public/snippets/${snippet._id}`;
+              try {
+                await navigator.clipboard.writeText(url);
+              } catch {
+                // fallback: still open the link in a new tab
+                window.open(url, "_blank", "noopener,noreferrer");
+              }
+            }}
+            className="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-white transition"
+            title="Copy public link"
+          >
+            Share
+          </button>
+        )}
+
+        {onFavorite && (
+          <button
+            type="button"
+            onClick={() => onFavorite(snippet)}
+            className={`px-3 py-1 text-xs rounded transition ${
+              isFavorited
+                ? "bg-yellow-500 hover:bg-yellow-600 text-black"
+                : "bg-slate-700 hover:bg-slate-600 text-white"
+            }`}
+          >
+            {isFavorited ? "★ Favorited" : "☆ Favorite"}
+          </button>
+        )}
+
         {onEdit && (
           <button
             onClick={() => onEdit(snippet)}
             className="px-3 py-1 text-xs rounded bg-blue-600 hover:bg-blue-700 text-white transition"
           >
-            Edit
+            {editLabel}
           </button>
         )}
         {onDelete && (
