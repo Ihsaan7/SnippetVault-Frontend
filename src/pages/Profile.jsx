@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "../utils/axios.js";
 
 export function Profile() {
@@ -35,8 +34,6 @@ export function Profile() {
   // Submission state
   const [submitting, setSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
-
-  const navigate = useNavigate();
 
   // Fetch profile on mount
   useEffect(() => {
