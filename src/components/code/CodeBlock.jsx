@@ -28,6 +28,7 @@ export function CodeBlock({
   language = "",
   className = "",
   copyOnClick = true,
+  wrap = true,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -48,7 +49,9 @@ export function CodeBlock({
   return (
     <div className="relative">
       <pre
-        className={`${className} ${copyOnClick ? "cursor-copy" : ""}`}
+        className={`${className} ${
+          wrap ? "whitespace-pre-wrap break-words" : "whitespace-pre overflow-x-auto"
+        } ${copyOnClick ? "cursor-copy" : ""}`}
         title={copyOnClick ? "Click to copy" : undefined}
         onClick={
           copyOnClick
