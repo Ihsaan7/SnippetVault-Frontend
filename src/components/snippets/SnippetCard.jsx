@@ -67,7 +67,7 @@ export default function SnippetCard({
       <CodeBlock
         code={preview}
         language={codeLanguage}
-        className="mt-3 bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-3 text-xs overflow-x-auto"
+        className="mt-3 bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-3 text-xs"
       />
 
       {tagList.length > 0 && (

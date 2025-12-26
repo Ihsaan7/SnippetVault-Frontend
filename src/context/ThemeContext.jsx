@@ -3,57 +3,47 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const ThemeContext = createContext(null);
 
-const STORAGE_KEYS = {
-  mode: "sv_theme_mode", // auto | light | dark
-  accent: "sv_theme_accent", // ocean | forest | steel | amber
-};
-
-const DEFAULTS = {
-  mode: "auto",
-  accent: "ocean",
-};
+const STORAGE_KEY = "sv_theme_mode"; // auto | light | dark
 
 const getSystemTheme = () => {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
 };
 
-export const ThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState(DEFAULTS.mode);
-  const [accent, setAccent] = useState(DEFAULTS.accent);
+export function ThemeProvider({ children }) {
+  const [mode, setMode] = useState("auto");
 
-  // hydrate from localStorage
+  // hydrate
   useEffect(() => {
     try {
-      const storedMode = localStorage.getItem(STORAGE_KEYS.mode);
-      const storedAccent = localStorage.getItem(STORAGE_KEYS.accent);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (storedMode) setMode(storedMode);
-      if (storedAccent) setAccent(storedAccent);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored === "light" || stored === "dark" || stored === "auto") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMode(stored);
+      }
     } catch {
       // ignore
     }
   }, []);
 
-  // apply to <html>
+  // apply
   useEffect(() => {
     const root = document.documentElement;
 
     const apply = () => {
       const resolved = mode === "auto" ? getSystemTheme() : mode;
       root.dataset.theme = resolved;
-      root.dataset.accent = accent;
       root.style.colorScheme = resolved;
     };
 
     apply();
 
-    // if auto, keep in sync with system
     if (mode === "auto" && window.matchMedia) {
       const mql = window.matchMedia("(prefers-color-scheme: dark)");
       const onChange = () => apply();
+
       if (mql.addEventListener) mql.addEventListener("change", onChange);
       else mql.addListener(onChange);
 
@@ -62,44 +52,31 @@ export const ThemeProvider = ({ children }) => {
         else mql.removeListener(onChange);
       };
     }
-  }, [mode, accent]);
+  }, [mode]);
 
   // persist
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEYS.mode, mode);
-      localStorage.setItem(STORAGE_KEYS.accent, accent);
+      localStorage.setItem(STORAGE_KEY, mode);
     } catch {
       // ignore
     }
-  }, [mode, accent]);
+  }, [mode]);
 
   const value = useMemo(
     () => ({
       mode,
-      accent,
       setMode,
-      setAccent,
-      palettes: [
-        { id: "ocean", label: "Ocean" },
-        { id: "forest", label: "Forest" },
-        { id: "steel", label: "Steel" },
-        { id: "amber", label: "Amber" },
-      ],
-      modes: [
-        { id: "auto", label: "Auto" },
-        { id: "light", label: "Light" },
-        { id: "dark", label: "Dark" },
-      ],
+      toggle: () => setMode((m) => (m === "dark" ? "light" : "dark")),
     }),
-    [mode, accent]
+    [mode]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-};
+}
 
-export const useTheme = () => {
+export function useTheme() {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
   return ctx;
-};
+}

@@ -126,7 +126,7 @@ export function PublicSnippetView() {
         <CodeBlock
           code={snippet.code}
           language={snippet.codeLanguage}
-          className="bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-4 text-sm overflow-x-auto"
+          className="bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-4 text-sm"
         />
       </div>
     </div>
