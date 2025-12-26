@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { RegisterationForm } from "./components/auth/RegisterationForm";
 import { LoginForm } from "./components/auth/LoginForm";
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
+import { DashboardLayout } from "./components/layout/DashboardLayout";
 import "./App.css";
 import { Dashboard } from "./pages/Dashboard";
 import SnippetCreate from "./pages/SnippetCreate";
@@ -25,54 +26,18 @@ function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
-      <Route />
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="favorites" element={<Favorites />} />
+        <Route path="create" element={<SnippetCreate />} />
+        <Route path="snippets" element={<Snippets />} />
+        <Route path="snippets/:id/edit" element={<SnippetEdit />} />
+      </Route>
 
-      <Route
-        path="/dashboard/profile"
-        element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/dashboard/favorites"
-        element={
-          <ProtectedRoute>
-            <Favorites />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/dashboard/create"
-        element={
-          <ProtectedRoute>
-            <SnippetCreate />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard/snippets"
-        element={
-          <ProtectedRoute>
-            <Snippets />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard/snippets/:id/edit"
-        element={
-          <ProtectedRoute>
-            <SnippetEdit />
-          </ProtectedRoute>
-        }
-      />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
