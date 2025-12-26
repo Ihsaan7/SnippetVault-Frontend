@@ -1,4 +1,13 @@
-export default function SnippetCard({ snippet, onEdit, onDelete }) {
+import { useRef } from "react";
+
+export default function SnippetCard({
+  snippet,
+  onEdit,
+  onDelete,
+  onTagLongPress,
+}) {
+  const longPressTimeout = useRef(null);
+  const longPressedRef = useRef(false);
   if (!snippet) return null;
 
   const {
@@ -12,6 +21,22 @@ export default function SnippetCard({ snippet, onEdit, onDelete }) {
 
   const tagList = Array.isArray(tags) ? tags : [];
   const preview = (code || "").split("\n").slice(0, 8).join("\n");
+
+  const startLongPress = (t) => {
+    if (longPressTimeout.current) clearTimeout(longPressTimeout.current);
+    longPressedRef.current = false;
+    longPressTimeout.current = setTimeout(() => {
+      longPressedRef.current = true;
+      onTagLongPress?.(t);
+    }, 600); // hold ~600ms to trigger filter
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      longPressTimeout.current = null;
+    }
+  };
 
   return (
     <div className="bg-slate-800 border border-slate-700 rounded-lg p-5">
@@ -38,12 +63,20 @@ export default function SnippetCard({ snippet, onEdit, onDelete }) {
       {tagList.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {tagList.map((t, i) => (
-            <span
+            <button
               key={`${t}-${i}`}
-              className="px-2 py-1 text-xs rounded bg-slate-700 text-slate-300 border border-slate-600"
+              type="button"
+              onMouseDown={() => startLongPress(t)}
+              onMouseUp={cancelLongPress}
+              onMouseLeave={cancelLongPress}
+              onTouchStart={() => startLongPress(t)}
+              onTouchEnd={cancelLongPress}
+              title="Hold to filter by tag"
+              aria-label={`Tag ${t}: hold to filter`}
+              className="px-2 py-1 text-xs rounded border transition cursor-pointer bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600"
             >
               {t}
-            </span>
+            </button>
           ))}
         </div>
       )}
