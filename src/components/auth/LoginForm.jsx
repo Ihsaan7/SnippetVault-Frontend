@@ -28,83 +28,113 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
-      <div className="max-w-md w-full bg-[var(--surface)] border border-[var(--border)] p-8">
-        {/* Header */}
-        <h1 className="text-2xl font-semibold text-center mb-6">Login</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Identifier Input */}
-          <div>
-            <label
-              htmlFor="identifier"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Username or Email
-            </label>
-            <input
-              type="text"
-              id="identifier"
-              name="identifier"
-              value={formData.identifier}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="Enter username or email"
-            />
+      <div className="w-full max-w-sm fade-in">
+        <div className="text-center mb-8">
+          <div className="inline-flex w-12 h-12 rounded-xl bg-[var(--accent)] items-center justify-center mb-4">
+            <span className="text-lg font-bold text-white">SV</span>
           </div>
-
-          {/* Password Input */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="border border-red-500 bg-[var(--surface)] p-4">
-              <p className="text-sm text-red-600 font-medium">{error}</p>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-3 px-4 border font-semibold ${
-              isLoading
-                ? "border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] cursor-not-allowed"
-                : "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
-            }`}
-          >
-            {isLoading ? "Logging In..." : "Login"}
-          </button>
-          <p className="text-sm text-[var(--muted)]">
-            New user? Create an account.
+          <h1 className="text-2xl font-semibold text-[var(--text)]">
+            Sign in to SnippetVault
+          </h1>
+          <p className="mt-2 text-sm text-[var(--muted)]">
+            Welcome back! Enter your credentials.
           </p>
-          <button
-            type="button"
-            onClick={() => navigate("/register")}
-            className="w-full py-3 px-4 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] font-semibold hover:border-[var(--accent)] hover:text-[var(--accent)]"
-          >
-            Register
-          </button>
-        </form>
+        </div>
+
+        <div className="card p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="identifier"
+                className="block text-sm font-medium text-[var(--text)] mb-1.5"
+              >
+                Username or Email
+              </label>
+              <input
+                type="text"
+                id="identifier"
+                name="identifier"
+                value={formData.identifier}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="input"
+                placeholder="Enter username or email"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-[var(--text)] mb-1.5"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="input"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-md bg-[var(--danger-muted)] border border-[var(--danger)] text-sm text-[var(--danger)]">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn btn-primary w-full py-2.5"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4 spin" viewBox="0 0 24 24" fill="none">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="opacity-25"
+                    />
+                    <path
+                      d="M12 2a10 10 0 0 1 10 10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="opacity-75"
+                    />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign in"
+              )}
+            </button>
+          </form>
+        </div>
+
+        <div className="mt-6 card p-4 text-center">
+          <p className="text-sm text-[var(--text-secondary)]">
+            New to SnippetVault?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/register")}
+              className="text-[var(--link)] hover:text-[var(--link-hover)] font-medium hover:underline"
+            >
+              Create an account
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

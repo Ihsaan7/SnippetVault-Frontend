@@ -10,6 +10,7 @@ export function RegisterationForm() {
     fullName: "",
   });
   const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const { isLoading, register, error } = useAuth();
   const navigate = useNavigate();
 
@@ -20,10 +21,19 @@ export function RegisterationForm() {
     });
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setAvatarPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create FormData to include avatar file
     const submitData = new FormData();
     submitData.append("username", formData.username);
     submitData.append("email", formData.email);
@@ -41,171 +51,192 @@ export function RegisterationForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
-      <div className="max-w-md w-full bg-[var(--surface)] border border-[var(--border)] p-8">
-        {/* Header */}
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4 py-8">
+      <div className="w-full max-w-sm fade-in">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold">Create Account</h2>
-          <p className="text-[var(--muted)] mt-2 text-sm">Join SnippetVault today</p>
+          <div className="inline-flex w-12 h-12 rounded-xl bg-[var(--accent)] items-center justify-center mb-4">
+            <span className="text-lg font-bold text-white">SV</span>
+          </div>
+          <h1 className="text-2xl font-semibold text-[var(--text)]">
+            Create your account
+          </h1>
+          <p className="mt-2 text-sm text-[var(--muted)]">
+            Join SnippetVault and start organizing your code.
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Username Input */}
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              disabled={isLoading} // Use local state here
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="johndoe123"
-            />
-          </div>
-
-          {/* FullName Input */}
-          <div>
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-              disabled={isLoading} // Use local state here
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="johndoe123"
-            />
-          </div>
-
-          {/* Email Input */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="john@example.com"
-            />
-          </div>
-
-          {/* Password Input */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              disabled={isLoading}
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="••••••••"
-            />
-            <p className="text-xs text-[var(--muted)] mt-1">
-              Must be at least 6 characters
-            </p>
-          </div>
-
-          {/* Avatar Input */}
-          <div>
-            <label
-              htmlFor="avatar"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
-            >
-              Profile Picture
-            </label>
-            <input
-              type="file"
-              id="avatar"
-              accept="image/*"
-              onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-              required
-              disabled={isLoading}
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60 text-sm"
-            />
-            <p className="text-xs text-[var(--muted)] mt-1">
-              Upload an image file for your profile
-            </p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="border border-red-500 bg-[var(--surface)] p-4">
-              <p className="text-sm text-red-600 font-medium">{error}</p>
+        <div className="card p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex justify-center mb-2">
+              <label className="relative cursor-pointer group">
+                <div className="w-20 h-20 rounded-full border-2 border-dashed border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-subtle)]">
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <svg
+                      className="w-8 h-8 text-[var(--muted)] group-hover:text-[var(--accent)] transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M12 4v16m-8-8h16" />
+                    </svg>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                  required
+                  disabled={isLoading}
+                />
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs text-[var(--muted)] whitespace-nowrap">
+                  Add photo
+                </span>
+              </label>
             </div>
-          )}
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-3 px-4 border font-semibold ${
-              isLoading
-                ? "border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] cursor-not-allowed"
-                : "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
-            }`}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Registering...
-              </span>
-            ) : (
-              "Create Account"
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  disabled={isLoading}
+                  className="input"
+                  placeholder="johndoe"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-[var(--text)] mb-1.5"
+                >
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  disabled={isLoading}
+                  className="input"
+                  placeholder="John Doe"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-[var(--text)] mb-1.5"
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="input"
+                placeholder="john@example.com"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-[var(--text)] mb-1.5"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                disabled={isLoading}
+                className="input"
+                placeholder="Min. 6 characters"
+              />
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-md bg-[var(--danger-muted)] border border-[var(--danger)] text-sm text-[var(--danger)]">
+                {error}
+              </div>
             )}
-          </button>
-        </form>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn btn-primary w-full py-2.5"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4 spin" viewBox="0 0 24 24" fill="none">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="opacity-25"
+                    />
+                    <path
+                      d="M12 2a10 10 0 0 1 10 10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="opacity-75"
+                    />
+                  </svg>
+                  Creating account...
+                </span>
+              ) : (
+                "Create account"
+              )}
+            </button>
+          </form>
+        </div>
+
+        <div className="mt-6 card p-4 text-center">
+          <p className="text-sm text-[var(--text-secondary)]">
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="text-[var(--link)] hover:text-[var(--link-hover)] font-medium hover:underline"
+            >
+              Sign in
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
