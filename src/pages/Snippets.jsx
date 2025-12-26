@@ -12,32 +12,62 @@ export function Snippets() {
     deleteSnippet,
     pagination,
     getAllTags,
+    toggleFavorite,
   } = useSnippet();
   const { totalPages = 1 } = pagination || {};
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(6);
+  const [limit] = useState(6);
   const [search, setSearch] = useState("");
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [language, setLanguage] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [availableTags, setAvailableTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // initial load: fetch tags
+    // initial load: fetch tags + load search history
     (async () => {
       const tags = await getAllTags();
       setAvailableTags(tags);
+
+      try {
+        const raw = localStorage.getItem("snippet_search_history");
+        const parsed = raw ? JSON.parse(raw) : [];
+        setSearchHistory(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        setSearchHistory([]);
+      }
     })();
   }, []);
 
+  const pushSearchHistory = (term) => {
+    const cleaned = String(term || "").trim();
+    if (!cleaned) return;
+
+    try {
+      const next = [
+        cleaned,
+        ...searchHistory.filter((s) => String(s).trim() !== cleaned),
+      ].slice(0, 8);
+      setSearchHistory(next);
+      localStorage.setItem("snippet_search_history", JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      getSnippets({ page, limit, search, tags: selectedTags });
+      getSnippets({ page, limit, search, tags: selectedTags, language, from, to });
+      pushSearchHistory(search);
     }, 250);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [page, limit, search, selectedTags]);
+  }, [page, limit, search, selectedTags, language, from, to]);
 
   const handleEdit = (snippet) => {
     navigate(`/dashboard/snippets/${snippet._id}/edit`);
@@ -46,6 +76,14 @@ export function Snippets() {
   const handleDelete = async (snippet) => {
     if (!window.confirm(`Delete "${snippet.title}"?`)) return;
     await deleteSnippet(snippet._id);
+  };
+
+  const handleFavorite = async (snippet) => {
+    try {
+      await toggleFavorite(snippet._id);
+    } catch {
+      // fallback: do nothing (error is logged in context)
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -66,12 +104,51 @@ export function Snippets() {
         <div className="flex justify-between items-center mb-6 gap-4">
           <h1 className="text-3xl font-bold text-white">Your Snippets</h1>
           <div className="flex items-center gap-2">
+            <datalist id="snippet-search-history">
+              {searchHistory.map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+
             <input
               type="text"
               value={search}
               onChange={handleSearchChange}
+              list="snippet-search-history"
               placeholder="Search snippets..."
               className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white w-full md:w-64"
+            />
+
+            <input
+              type="text"
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Language (e.g. js)"
+              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white w-full md:w-40"
+            />
+
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => {
+                setFrom(e.target.value);
+                setPage(1);
+              }}
+              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white"
+              title="From"
+            />
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => {
+                setTo(e.target.value);
+                setPage(1);
+              }}
+              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white"
+              title="To"
             />
           </div>
 
@@ -148,6 +225,7 @@ export function Snippets() {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onTagLongPress={toggleTag}
+                onFavorite={handleFavorite}
               />
             ))}
           </div>

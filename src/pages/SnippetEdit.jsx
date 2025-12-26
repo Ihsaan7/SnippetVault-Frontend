@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import hljs from "highlight.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSnippet } from "../context/SnippetContext";
 
@@ -15,6 +16,7 @@ export default function SnippetEdit() {
     description: "",
     isPublic: false,
   });
+  const [languageManuallySet, setLanguageManuallySet] = useState(false);
 
   useEffect(() => {
     const loadSnippet = async () => {
@@ -34,11 +36,36 @@ export default function SnippetEdit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  const detectLanguage = (code) => {
+    const text = String(code || "");
+    if (!text.trim()) return null;
+    try {
+      const result = hljs.highlightAuto(text);
+      return result.language || null;
+    } catch {
+      return null;
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
+
+    if (name === "codeLanguage") {
+      setLanguageManuallySet(true);
+    }
+
+    setFormData((prev) => {
+      const next = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+
+      if (name === "code" && !languageManuallySet) {
+        const detected = detectLanguage(value);
+        if (detected) next.codeLanguage = detected;
+      }
+
+      return next;
     });
   };
 
