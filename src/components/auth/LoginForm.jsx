@@ -27,19 +27,17 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
+      <div className="max-w-md w-full bg-[var(--surface)] border border-[var(--border)] p-8">
         {/* Header */}
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Login
-        </h1>
+        <h1 className="text-2xl font-semibold text-center mb-6">Login</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Identifier Input */}
           <div>
             <label
               htmlFor="identifier"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Username or Email
             </label>
@@ -51,7 +49,7 @@ export function LoginForm() {
               onChange={handleChange}
               required
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
               placeholder="Enter username or email"
             />
           </div>
@@ -60,7 +58,7 @@ export function LoginForm() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Password
             </label>
@@ -72,15 +70,15 @@ export function LoginForm() {
               onChange={handleChange}
               required
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
               placeholder="••••••••"
             />
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-              <p className="text-sm text-red-700 font-medium">{error}</p>
+            <div className="border border-red-500 bg-[var(--surface)] p-4">
+              <p className="text-sm text-red-600 font-medium">{error}</p>
             </div>
           )}
 
@@ -88,17 +86,24 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg text-white font-semibold shadow-md transition-colors
-            ${
+            className={`w-full py-3 px-4 border font-semibold ${
               isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                ? "border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] cursor-not-allowed"
+                : "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
             }`}
           >
             {isLoading ? "Logging In..." : "Login"}
           </button>
-          <p>New user! Create account!</p>
-          <button onClick={() => navigate("/register")}>REGISTER</button>
+          <p className="text-sm text-[var(--muted)]">
+            New user? Create an account.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/register")}
+            className="w-full py-3 px-4 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] font-semibold hover:border-[var(--accent)] hover:text-[var(--accent)]"
+          >
+            Register
+          </button>
         </form>
       </div>
     </div>

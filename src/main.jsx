@@ -5,15 +5,18 @@ import { AuthProvider } from "./context/AuthContext";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { SnippetProvider } from "./context/SnippetContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <SnippetProvider>
-          <App />
-        </SnippetProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <SnippetProvider>
+            <App />
+          </SnippetProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
