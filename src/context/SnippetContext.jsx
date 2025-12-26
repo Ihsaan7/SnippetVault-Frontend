@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState, createContext, useContext } from "react";
 import apiConfig from "../utils/axios";
 
@@ -21,7 +22,7 @@ export const SnippetProvider = ({ children }) => {
     try {
       const response = await apiConfig.post("/snippets/create", formData);
       if (response && response.data && response.data.data) {
-        setSnippets([response.data.data, ...snippets]);
+        setSnippets((prev) => [response.data.data, ...prev]);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Creating snippet failed!");
@@ -36,6 +37,9 @@ export const SnippetProvider = ({ children }) => {
     limit = 6,
     search = "",
     tags = [],
+    language = "",
+    from = "",
+    to = "",
   } = {}) => {
     setIsLoading(true);
     setError(null);
@@ -47,6 +51,9 @@ export const SnippetProvider = ({ children }) => {
           limit,
           search,
           tags: Array.isArray(tags) ? tags.join(",") : tags,
+          language,
+          from,
+          to,
         },
       });
       if (response && response.data && response.data.data.snippets) {
@@ -107,8 +114,8 @@ export const SnippetProvider = ({ children }) => {
     try {
       const response = await apiConfig.put(`/snippets/${snippetID}`, formData);
       if (response && response.data && response.data.data) {
-        setSnippets(
-          snippets.map((s) => (s._id === snippetID ? response.data.data : s))
+        setSnippets((prev) =>
+          prev.map((s) => (s._id === snippetID ? response.data.data : s))
         );
       }
     } catch (err) {
@@ -126,13 +133,118 @@ export const SnippetProvider = ({ children }) => {
     try {
       const response = await apiConfig.delete(`/snippets/${snippetID}`);
       if (response && response.data && response.data.success) {
-        setSnippets(snippets.filter((s) => s._id !== snippetID));
+        setSnippets((prev) => prev.filter((s) => s._id !== snippetID));
       }
     } catch (err) {
       setError(err.response?.data?.message || "Deleting snippet failed!");
       console.error("FRONTEND_DELETE_CONTEXT");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const toggleFavorite = async (snippetID) => {
+    try {
+      const response = await apiConfig.post(`/snippets/${snippetID}/favorite`);
+      const data = response?.data?.data;
+
+      if (data?.snippetID) {
+        setSnippets((prev) =>
+          prev.map((s) =>
+            s._id === data.snippetID
+              ? {
+                  ...s,
+                  isFavorited: data.isFavorited,
+                  favoriteCount: data.favoriteCount,
+                }
+              : s
+          )
+        );
+      }
+
+      return data;
+    } catch (err) {
+      console.error("FRONTEND_TOGGLE_FAVORITE_CONTEXT", err);
+      throw err;
+    }
+  };
+
+  const getFavoriteSnippets = async ({ page = 1, limit = 10 } = {}) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiConfig.get("/snippets/favorites", {
+        params: { page, limit },
+      });
+
+      if (response?.data?.data?.snippets) {
+        setSnippets(response.data.data.snippets);
+        if (response.data.data.pagination) setPagination(response.data.data.pagination);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Fetching favorites failed!");
+      console.error("FRONTEND_FETCH_FAVORITES_CONTEXT", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getPublicSnippets = async ({
+    page = 1,
+    limit = 10,
+    search = "",
+    tags = [],
+    language = "",
+    from = "",
+    to = "",
+  } = {}) => {
+    try {
+      const response = await apiConfig.get("/snippets/public", {
+        params: {
+          page,
+          limit,
+          search,
+          tags: Array.isArray(tags) ? tags.join(",") : tags,
+          language,
+          from,
+          to,
+        },
+      });
+      return response?.data?.data;
+    } catch (err) {
+      console.error("FRONTEND_PUBLIC_SNIPPETS_CONTEXT", err);
+      throw err;
+    }
+  };
+
+  const getPublicSnippetByID = async (snippetID) => {
+    try {
+      const response = await apiConfig.get(`/snippets/public/${snippetID}`);
+      return response?.data?.data;
+    } catch (err) {
+      console.error("FRONTEND_PUBLIC_SNIPPET_BY_ID_CONTEXT", err);
+      throw err;
+    }
+  };
+
+  const forkPublicSnippet = async (snippetID) => {
+    try {
+      const response = await apiConfig.post(`/snippets/${snippetID}/fork`);
+      return response?.data?.data;
+    } catch (err) {
+      console.error("FRONTEND_FORK_SNIPPET_CONTEXT", err);
+      throw err;
+    }
+  };
+
+  const getSnippetStats = async () => {
+    try {
+      const response = await apiConfig.get("/snippets/stats");
+      return response?.data?.data;
+    } catch (err) {
+      console.error("FRONTEND_SNIPPET_STATS_CONTEXT", err);
+      throw err;
     }
   };
 
@@ -148,6 +260,12 @@ export const SnippetProvider = ({ children }) => {
         getSnippets,
         getAllTags,
         getTagStats,
+        toggleFavorite,
+        getFavoriteSnippets,
+        getPublicSnippets,
+        getPublicSnippetByID,
+        forkPublicSnippet,
+        getSnippetStats,
         updateSnippet,
         deleteSnippet,
       }}
