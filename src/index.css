@@ -5,63 +5,54 @@
     /* Sharp corners everywhere */
     --radius: 0px;
 
-    /* Theme tokens (resolved theme is applied via <html data-theme="light|dark">) */
-    --bg: #f8fafc;
+    /* GitHub-like LIGHT */
+    --bg: #ffffff;
     --surface: #ffffff;
-    --surface-2: #f1f5f9;
-    --text: #0f172a;
-    --muted: #475569;
-    --border: #cbd5e1;
+    --surface-2: #f6f8fa;
+    --text: #24292f;
+    --muted: #57606a;
 
-    /* Accent (overridden by [data-accent]) */
-    --accent: #1d4ed8; /* blue-700 */
-    --accent-2: #0f766e; /* teal-700 */
+    /* User preference: borders mostly white/green */
+    --border: #2da44e;
+    --glow: rgba(45, 164, 78, 0.22);
+
+    /* GitHub green accent */
+    --accent: #2da44e;
+    --accent-2: #238636;
     --accent-contrast: #ffffff;
 
+    /* Links */
+    --link: #0969da;
+
     /* Code block */
-    --code-bg: #0b1220;
-    --code-text: #e2e8f0;
+    --code-bg: #0d1117;
+    --code-text: #c9d1d9;
 
     color-scheme: light;
   }
 
   :root[data-theme="dark"] {
-    --bg: #0b1220;
-    --surface: #0f172a;
-    --surface-2: #111c33;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --border: #1f2a44;
+    /* GitHub-like DARK */
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #0d1117;
+    --text: #c9d1d9;
+    --muted: #8b949e;
 
-    --code-bg: #070d1a;
-    --code-text: #e2e8f0;
+    /* White-ish borders + green accents (as requested) */
+    --border: rgba(255, 255, 255, 0.18);
+    --glow: rgba(45, 164, 78, 0.25);
+
+    --accent: #2da44e;
+    --accent-2: #238636;
+    --accent-contrast: #ffffff;
+
+    --link: #58a6ff;
+
+    --code-bg: #0d1117;
+    --code-text: #c9d1d9;
 
     color-scheme: dark;
-  }
-
-  /* Accent palettes (no purple/pink) */
-  :root[data-accent="ocean"] {
-    --accent: #1d4ed8; /* blue */
-    --accent-2: #0f766e; /* teal */
-    --accent-contrast: #ffffff;
-  }
-
-  :root[data-accent="forest"] {
-    --accent: #15803d; /* green */
-    --accent-2: #a16207; /* amber */
-    --accent-contrast: #ffffff;
-  }
-
-  :root[data-accent="steel"] {
-    --accent: #334155; /* slate */
-    --accent-2: #0ea5e9; /* sky */
-    --accent-contrast: #ffffff;
-  }
-
-  :root[data-accent="amber"] {
-    --accent: #b45309; /* amber */
-    --accent-2: #1d4ed8; /* blue */
-    --accent-contrast: #ffffff;
   }
 
   html,
@@ -73,16 +64,55 @@
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
-      Arial, "Apple Color Emoji", "Segoe UI Emoji";
+
+    /* Next.js-like modern system font stack */
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI Variable", "Segoe UI", Roboto, Helvetica, Arial,
+      "Apple Color Emoji", "Segoe UI Emoji";
+
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    /* Disable text selection (UI preference). We'll re-enable where needed. */
+    user-select: none;
+    cursor: default;
+  }
+
+  input,
+  textarea,
+  select,
+  option {
+    user-select: text;
+    cursor: text;
+  }
+
+  button {
+    user-select: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    filter: brightness(1.03);
+  }
+
+  button:active {
+    filter: brightness(0.98);
+  }
+
+  pre,
+  code {
+    user-select: none;
   }
 
   a {
-    color: var(--accent);
+    color: var(--link);
     text-decoration: none;
+    cursor: pointer;
   }
   a:hover {
     text-decoration: underline;
@@ -98,12 +128,20 @@
   a,
   input,
   textarea,
-  select {
-    transition: background-color 150ms ease, border-color 150ms ease,
-      color 150ms ease, transform 150ms ease;
+  select,
+  [role="button"] {
+    transition: background-color 160ms ease, border-color 160ms ease,
+      color 160ms ease, transform 160ms ease, box-shadow 160ms ease,
+      filter 160ms ease;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow: 0 0 0 3px var(--glow);
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--accent) 30%, transparent);
+    background: transparent;
   }
 }
