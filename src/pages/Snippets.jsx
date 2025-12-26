@@ -3,11 +3,11 @@ import { useSnippet } from "../context/SnippetContext";
 import { useEffect, useRef, useState } from "react";
 import SnippetCard from "../components/snippets/SnippetCard";
 
-function DateField({ value, onChange, title }) {
+function DateField({ value, onChange, title, placeholder }) {
   const ref = useRef(null);
 
   return (
-    <div className="flex items-stretch border border-[var(--border)] bg-[var(--surface)] focus-within:border-[var(--accent)]">
+    <div className="relative">
       <input
         ref={ref}
         type="date"
@@ -15,15 +15,25 @@ function DateField({ value, onChange, title }) {
         onChange={onChange}
         title={title}
         lang="en-CA"
-        className="px-3 py-2 bg-transparent text-[var(--text)] text-sm focus:outline-none appearance-none"
+        className="input pr-8"
+        placeholder={placeholder}
       />
       <button
         type="button"
         onClick={() => ref.current?.showPicker?.()}
-        className="px-3 border-l border-[var(--border)] text-xs text-[var(--muted)] hover:text-[var(--accent)]"
+        className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--text)] transition-colors"
         title="Open calendar"
       >
-        Pick
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          viewBox="0 0 16 16"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <rect x="2" y="3" width="12" height="11" rx="1" />
+          <path d="M2 6h12M5 1v3M11 1v3" />
+        </svg>
       </button>
     </div>
   );
@@ -53,7 +63,6 @@ export function Snippets() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // initial load: fetch tags + load search history
     (async () => {
       const tags = await getAllTags();
       setAvailableTags(tags);
@@ -66,7 +75,6 @@ export function Snippets() {
         setSearchHistory([]);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const pushSearchHistory = (term) => {
@@ -94,7 +102,6 @@ export function Snippets() {
     return () => {
       clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, limit, search, selectedTags, language, from, to]);
 
   const handleEdit = (snippet) => {
@@ -110,7 +117,7 @@ export function Snippets() {
     try {
       await toggleFavorite(snippet._id);
     } catch {
-      // fallback: do nothing (error is logged in context)
+      // fallback: do nothing
     }
   };
 
@@ -126,32 +133,72 @@ export function Snippets() {
     setPage(1);
   };
 
+  const clearFilters = () => {
+    setSearch("");
+    setLanguage("");
+    setFrom("");
+    setTo("");
+    setSelectedTags([]);
+    setPage(1);
+  };
+
+  const hasFilters = search || language || from || to || selectedTags.length > 0;
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-semibold">Snippets</h1>
-          <p className="text-sm text-[var(--muted)]">
-            Tip: click code to copy. Hold a tag to filter.
+          <h1 className="text-2xl font-semibold text-[var(--text)]">Snippets</h1>
+          <p className="text-sm text-[var(--muted)] mt-1">
+            Manage and organize your code snippets.
           </p>
         </div>
+        <button
+          onClick={() => navigate("/dashboard/create")}
+          className="btn btn-primary"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 16 16"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path d="M8 3v10M3 8h10" />
+          </svg>
+          New Snippet
+        </button>
+      </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <datalist id="snippet-search-history">
-            {searchHistory.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
-
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearchChange}
-            list="snippet-search-history"
-            placeholder="Search title, tags, code..."
-            className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] w-full md:w-64 focus:outline-none focus:border-[var(--accent)]"
-          />
-
+      <div className="card p-4">
+        <div className="flex flex-wrap gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <datalist id="snippet-search-history">
+              {searchHistory.map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+            <div className="relative">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]"
+                fill="none"
+                viewBox="0 0 16 16"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <circle cx="7" cy="7" r="5" />
+                <path d="M11 11l3 3" />
+              </svg>
+              <input
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                list="snippet-search-history"
+                placeholder="Search snippets..."
+                className="input pl-9"
+              />
+            </div>
+          </div>
           <input
             type="text"
             value={language}
@@ -160,9 +207,8 @@ export function Snippets() {
               setPage(1);
             }}
             placeholder="Language"
-            className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] w-full md:w-40 focus:outline-none focus:border-[var(--accent)]"
+            className="input w-32"
           />
-
           <DateField
             value={from}
             onChange={(e) => {
@@ -170,6 +216,7 @@ export function Snippets() {
               setPage(1);
             }}
             title="From"
+            placeholder="From"
           />
           <DateField
             value={to}
@@ -178,58 +225,85 @@ export function Snippets() {
               setPage(1);
             }}
             title="To"
+            placeholder="To"
           />
-        </div>
-      </div>
-
-      {/* Tag Filters */}
-      {availableTags.length > 0 && (
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-3">
-          <div className="flex flex-wrap gap-2">
-            {availableTags.map((t) => {
-              const active = selectedTags.includes(t);
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => toggleTag(t)}
-                  className={`px-3 py-1 text-xs border ${
-                    active
-                      ? "bg-[var(--accent)] border-[var(--accent)] text-[var(--accent-contrast)]"
-                      : "bg-[var(--surface)] border-[var(--border)] text-[var(--text)]/80 hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                  }`}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-          {selectedTags.length > 0 && (
-            <p className="mt-2 text-xs text-[var(--muted)]">
-              Filtering by: {selectedTags.join(", ")}
-            </p>
+          {hasFilters && (
+            <button onClick={clearFilters} className="btn btn-ghost text-sm">
+              Clear filters
+            </button>
           )}
         </div>
-      )}
+
+        {availableTags.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-[var(--border)]">
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((t) => {
+                const active = selectedTags.includes(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => toggleTag(t)}
+                    className={`tag tag-interactive ${active ? "tag-active" : ""}`}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+            {selectedTags.length > 0 && (
+              <p className="mt-2 text-xs text-[var(--muted)]">
+                Filtering by: {selectedTags.join(", ")}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
 
       {isLoading && (
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">
-          Loading snippets...
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="card p-5 space-y-3">
+              <div className="skeleton h-5 w-3/4 rounded"></div>
+              <div className="skeleton h-4 w-1/2 rounded"></div>
+              <div className="skeleton h-24 rounded"></div>
+              <div className="flex gap-2">
+                <div className="skeleton h-6 w-16 rounded-full"></div>
+                <div className="skeleton h-6 w-16 rounded-full"></div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {error && (
-        <div className="border border-red-500 bg-[var(--surface)] p-4 text-red-600">
+        <div className="card p-4 border-[var(--danger)] bg-[var(--danger-muted)] text-[var(--danger)]">
           {error}
         </div>
       )}
 
       {!isLoading && !error && snippets?.length === 0 && (
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-8">
-          <p className="text-[var(--muted)]">No snippets yet.</p>
+        <div className="card p-12 text-center">
+          <div className="inline-flex w-16 h-16 rounded-full bg-[var(--surface-2)] items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-[var(--muted)]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-[var(--text)]">No snippets found</h3>
+          <p className="text-[var(--muted)] mt-1">
+            {hasFilters
+              ? "Try adjusting your filters"
+              : "Create your first snippet to get started"}
+          </p>
           <button
             onClick={() => navigate("/dashboard/create")}
-            className="mt-4 px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
+            className="btn btn-primary mt-4"
           >
             Create Snippet
           </button>
@@ -251,27 +325,60 @@ export function Snippets() {
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-3">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page <= 1 || isLoading}
-          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
-        >
-          Prev
-        </button>
-        <span className="text-[var(--muted)] text-sm">
-          Page {page} of {totalPages || 1}
-        </span>
-        <button
-          onClick={() =>
-            setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
-          }
-          disabled={isLoading || (totalPages && page >= totalPages)}
-          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1 || isLoading}
+            className="btn btn-secondary"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M10 4L6 8l4 4" />
+            </svg>
+            Previous
+          </button>
+          <div className="flex items-center gap-1">
+            {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+              const pageNum = i + 1;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setPage(pageNum)}
+                  className={`btn ${
+                    page === pageNum ? "btn-primary" : "btn-ghost"
+                  } w-9 h-9 p-0`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            onClick={() =>
+              setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
+            }
+            disabled={isLoading || (totalPages && page >= totalPages)}
+            className="btn btn-secondary"
+          >
+            Next
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M6 4l4 4-4 4" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

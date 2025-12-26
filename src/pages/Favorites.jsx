@@ -19,46 +19,78 @@ export function Favorites() {
 
   useEffect(() => {
     getFavoriteSnippets({ page, limit: 10 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-semibold">Favorites</h1>
-          <p className="text-sm text-[var(--muted)]">
-            Your saved snippets. Click code to copy.
+          <h1 className="text-2xl font-semibold text-[var(--text)]">Favorites</h1>
+          <p className="text-sm text-[var(--muted)] mt-1">
+            Your saved snippets for quick access.
           </p>
         </div>
         <button
           onClick={() => navigate("/dashboard/snippets")}
-          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm hover:border-[var(--accent)] hover:text-[var(--accent)]"
+          className="btn btn-secondary"
         >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 16 16"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path d="M10 4L6 8l4 4" />
+          </svg>
           Back to Snippets
         </button>
       </div>
 
       {isLoading && (
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">
-          Loading favorites...
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="card p-5 space-y-3">
+              <div className="skeleton h-5 w-3/4 rounded"></div>
+              <div className="skeleton h-4 w-1/2 rounded"></div>
+              <div className="skeleton h-24 rounded"></div>
+              <div className="flex gap-2">
+                <div className="skeleton h-6 w-16 rounded-full"></div>
+                <div className="skeleton h-6 w-16 rounded-full"></div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {error && (
-        <div className="border border-red-500 bg-[var(--surface)] p-4 text-red-600">
+        <div className="card p-4 border-[var(--danger)] bg-[var(--danger-muted)] text-[var(--danger)]">
           {error}
         </div>
       )}
 
       {!isLoading && !error && snippets?.length === 0 && (
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-8">
-          <p className="text-[var(--muted)]">No favorites yet.</p>
+        <div className="card p-12 text-center">
+          <div className="inline-flex w-16 h-16 rounded-full bg-[var(--surface-2)] items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-[var(--muted)]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M12 3l2.5 7.5H22l-6 4.5 2.5 7.5L12 18l-6.5 4.5 2.5-7.5-6-4.5h7.5L12 3z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-[var(--text)]">No favorites yet</h3>
+          <p className="text-[var(--muted)] mt-1">
+            Save snippets to find them quickly later.
+          </p>
           <button
             onClick={() => navigate("/dashboard/snippets")}
-            className="mt-4 px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
+            className="btn btn-primary mt-4"
           >
-            Browse your snippets
+            Browse Snippets
           </button>
         </div>
       )}
@@ -75,27 +107,47 @@ export function Favorites() {
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-3">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page <= 1 || isLoading}
-          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
-        >
-          Prev
-        </button>
-        <span className="text-[var(--muted)] text-sm">
-          Page {page} of {totalPages || 1}
-        </span>
-        <button
-          onClick={() =>
-            setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
-          }
-          disabled={isLoading || (totalPages && page >= totalPages)}
-          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1 || isLoading}
+            className="btn btn-secondary"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M10 4L6 8l4 4" />
+            </svg>
+            Previous
+          </button>
+          <span className="text-sm text-[var(--muted)] px-4">
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
+            }
+            disabled={isLoading || (totalPages && page >= totalPages)}
+            className="btn btn-secondary"
+          >
+            Next
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M6 4l4 4-4 4" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
