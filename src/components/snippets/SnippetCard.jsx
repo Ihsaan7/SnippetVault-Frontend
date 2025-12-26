@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { CodeBlock } from "../code/CodeBlock";
 
 export default function SnippetCard({
@@ -11,6 +11,8 @@ export default function SnippetCard({
 }) {
   const longPressTimeout = useRef(null);
   const longPressedRef = useRef(false);
+  const [isHovered, setIsHovered] = useState(false);
+
   if (!snippet) return null;
 
   const {
@@ -26,7 +28,7 @@ export default function SnippetCard({
   } = snippet;
 
   const tagList = Array.isArray(tags) ? tags : [];
-  const preview = (code || "").split("\n").slice(0, 8).join("\n");
+  const preview = (code || "").split("\n").slice(0, 6).join("\n");
 
   const startLongPress = (t) => {
     if (longPressTimeout.current) clearTimeout(longPressTimeout.current);
@@ -34,7 +36,7 @@ export default function SnippetCard({
     longPressTimeout.current = setTimeout(() => {
       longPressedRef.current = true;
       onTagLongPress?.(t);
-    }, 600); // hold ~600ms to trigger filter
+    }, 600);
   };
 
   const cancelLongPress = () => {
@@ -45,34 +47,64 @@ export default function SnippetCard({
   };
 
   return (
-    <div className="bg-[var(--surface)] border border-[var(--border)] p-5 hover:border-[var(--accent)] hover:translate-y-[-1px]">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-[var(--text)] text-lg font-semibold truncate">
+    <div
+      className="card card-hover p-5 flex flex-col"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-[var(--text)] font-semibold truncate leading-tight">
             {title}
           </h3>
-          <p className="text-[var(--muted)] text-sm">{codeLanguage}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-[var(--surface-2)] text-[var(--text-secondary)]">
+              {codeLanguage}
+            </span>
+            {isPublic && (
+              <span className="inline-flex items-center gap-1 text-xs text-[var(--muted)]">
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  viewBox="0 0 16 16"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <circle cx="8" cy="8" r="6" />
+                  <path d="M2 8h12M8 2c-2 2-2.5 4-2.5 6s.5 4 2.5 6c2-2 2.5-4 2.5-6S10 4 8 2z" />
+                </svg>
+                Public
+              </span>
+            )}
+          </div>
         </div>
         {createdAt && (
           <span className="text-[var(--muted)] text-xs whitespace-nowrap">
-            {new Date(createdAt).toLocaleDateString()}
+            {new Date(createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
           </span>
         )}
       </div>
 
       {description && (
-        <p className="text-[var(--text)]/80 mt-2 text-sm">{description}</p>
+        <p className="text-[var(--text-secondary)] text-sm mb-3 line-clamp-2">
+          {description}
+        </p>
       )}
 
-      <CodeBlock
-        code={preview}
-        language={codeLanguage}
-        className="mt-3 bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-3 text-xs"
-      />
+      <div className="flex-1">
+        <CodeBlock
+          code={preview}
+          language={codeLanguage}
+          className="bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-3 text-xs rounded-md"
+        />
+      </div>
 
       {tagList.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {tagList.map((t, i) => (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {tagList.slice(0, 4).map((t, i) => (
             <button
               key={`${t}-${i}`}
               type="button"
@@ -82,19 +114,36 @@ export default function SnippetCard({
               onTouchStart={() => startLongPress(t)}
               onTouchEnd={cancelLongPress}
               title="Hold to filter by tag"
-              aria-label={`Tag ${t}: hold to filter`}
-              className="px-2 py-1 text-xs border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]/80 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              className="tag tag-interactive"
             >
               {t}
             </button>
           ))}
+          {tagList.length > 4 && (
+            <span className="text-xs text-[var(--muted)] self-center">
+              +{tagList.length - 4}
+            </span>
+          )}
         </div>
       )}
 
-      <div className="flex gap-2 justify-end mt-3 flex-wrap">
+      <div
+        className={`flex items-center gap-2 mt-4 pt-3 border-t border-[var(--border)] transition-opacity duration-200 ${
+          isHovered ? "opacity-100" : "opacity-70"
+        }`}
+      >
         {typeof favoriteCount === "number" && (
-          <span className="mr-auto text-xs text-[var(--muted)] self-center">
-            Favorites: {favoriteCount}
+          <span className="flex items-center gap-1 text-xs text-[var(--muted)] mr-auto">
+            <svg
+              className="w-3.5 h-3.5"
+              fill={isFavorited ? "currentColor" : "none"}
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M8 2l1.5 4.5H14l-3.5 3 1.5 4.5L8 11l-4 3 1.5-4.5L2 6.5h4.5L8 2z" />
+            </svg>
+            {favoriteCount}
           </span>
         )}
 
@@ -103,8 +152,6 @@ export default function SnippetCard({
             type="button"
             onClick={async () => {
               const url = `${window.location.origin}/public/snippets/${snippet._id}`;
-
-              // 1) Native share (mobile + modern browsers). Requires secure context.
               if (navigator.share) {
                 try {
                   await navigator.share({
@@ -114,28 +161,36 @@ export default function SnippetCard({
                   });
                   return;
                 } catch {
-                  // user cancelled or unsupported -> continue to fallback
+                  // continue to fallback
                 }
               }
-
-              // 2) WhatsApp Web fallback (works on desktop too)
-              const wa = `https://wa.me/?text=${encodeURIComponent(url)}`;
               try {
-                window.open(wa, "_blank", "noopener,noreferrer");
+                window.open(
+                  `https://wa.me/?text=${encodeURIComponent(url)}`,
+                  "_blank",
+                  "noopener,noreferrer"
+                );
               } catch {
                 // ignore
               }
-
-              // 3) Also copy to clipboard as a reliable fallback
               try {
                 await navigator.clipboard.writeText(url);
               } catch {
                 // ignore
               }
             }}
-            className="px-3 py-1 text-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            className="btn btn-ghost text-xs px-2 py-1"
             title="Share"
           >
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M6 10l4-4M6 6h4v4M3 9v3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9" />
+            </svg>
             Share
           </button>
         )}
@@ -144,28 +199,38 @@ export default function SnippetCard({
           <button
             type="button"
             onClick={() => onFavorite(snippet)}
-            className={`px-3 py-1 text-xs border transition ${
+            className={`btn text-xs px-2 py-1 ${
               isFavorited
-                ? "bg-[var(--accent-2)] border-[var(--accent-2)] text-[var(--accent-contrast)] hover:brightness-95"
-                : "bg-[var(--surface)] border-[var(--border)] text-[var(--text)] hover:border-[var(--accent-2)]"
+                ? "btn-primary"
+                : "btn-secondary"
             }`}
           >
-            {isFavorited ? "★ Favorited" : "☆ Favorite"}
+            <svg
+              className="w-3.5 h-3.5"
+              fill={isFavorited ? "currentColor" : "none"}
+              viewBox="0 0 16 16"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M8 2l1.5 4.5H14l-3.5 3 1.5 4.5L8 11l-4 3 1.5-4.5L2 6.5h4.5L8 2z" />
+            </svg>
+            {isFavorited ? "Saved" : "Save"}
           </button>
         )}
 
         {onEdit && (
           <button
             onClick={() => onEdit(snippet)}
-            className="px-3 py-1 text-xs border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
+            className="btn btn-primary text-xs px-2 py-1"
           >
             {editLabel}
           </button>
         )}
+
         {onDelete && (
           <button
             onClick={() => onDelete(snippet)}
-            className="px-3 py-1 text-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-red-500 hover:text-red-500"
+            className="btn btn-outline-danger text-xs px-2 py-1"
           >
             Delete
           </button>

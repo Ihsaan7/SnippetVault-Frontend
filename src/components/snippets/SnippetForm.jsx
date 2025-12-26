@@ -17,7 +17,6 @@ export function SnippetForm({ onSuccess, initialValues }) {
 
   useEffect(() => {
     if (initialValues?.tags?.length) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTags([
         ...new Set(initialValues.tags.map((t) => t.toLowerCase().trim())),
       ]);
@@ -29,7 +28,7 @@ export function SnippetForm({ onSuccess, initialValues }) {
     const tag = sanitizeTag(raw);
     if (!tag) return;
     if (tags.includes(tag)) return;
-    if (tags.length >= 10) return; // max 10 tags
+    if (tags.length >= 10) return;
     setTags((prev) => [...prev, tag]);
   };
   const removeTag = (tag) => {
@@ -95,169 +94,206 @@ export function SnippetForm({ onSuccess, initialValues }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto border border-[var(--border)] bg-[var(--surface)] p-6">
-      <h1 className="text-2xl font-semibold mb-6">Create Snippet</h1>
+    <div className="max-w-3xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-[var(--text)]">
+          Create Snippet
+        </h1>
+        <p className="text-sm text-[var(--muted)] mt-1">
+          Add a new code snippet to your collection.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title Input */}
-        <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-[var(--muted)] mb-1"
-          >
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            required
-            value={formData.title}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-            placeholder="e.g., Express Middleware Template"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Language Input */}
+      <div className="card p-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
-              htmlFor="codeLanguage"
-              className="block text-sm font-medium text-[var(--muted)] mb-1"
+              htmlFor="title"
+              className="block text-sm font-medium text-[var(--text)] mb-1.5"
             >
-              Language
+              Title
             </label>
             <input
               type="text"
-              id="codeLanguage"
-              name="codeLanguage"
+              id="title"
+              name="title"
               required
-              value={formData.codeLanguage}
+              value={formData.title}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-              placeholder="javascript"
+              className="input"
+              placeholder="e.g., Express Middleware Template"
             />
           </div>
 
-          {/* Tags Input (chips) */}
-          <div>
-            <label className="block text-sm font-medium text-[var(--muted)] mb-1">
-              Tags
-            </label>
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={onTagKeyDown}
-              onBlur={onTagBlur}
-              disabled={isLoading}
-              placeholder="Type a tag and press Enter"
-              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-            />
-            <div className="mt-2 flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] px-3 py-1 text-xs"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-2 text-[var(--muted)] hover:text-[var(--accent)]"
-                    aria-label={`Remove ${tag}`}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="codeLanguage"
+                className="block text-sm font-medium text-[var(--text)] mb-1.5"
+              >
+                Language
+              </label>
+              <input
+                type="text"
+                id="codeLanguage"
+                name="codeLanguage"
+                required
+                value={formData.codeLanguage}
+                onChange={handleChange}
+                disabled={isLoading}
+                className="input"
+                placeholder="javascript"
+              />
+              <p className="mt-1 text-xs text-[var(--muted)]">
+                Auto-detected from code
+              </p>
             </div>
-            <p className="mt-1 text-xs text-[var(--muted)]">
-              Up to 10 tags. Press Enter to add.
-            </p>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
+                Tags
+              </label>
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={onTagKeyDown}
+                onBlur={onTagBlur}
+                disabled={isLoading}
+                placeholder="Press Enter to add"
+                className="input"
+              />
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tags.map((tag) => (
+                    <span key={tag} className="tag group">
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="ml-1.5 text-[var(--accent)] hover:text-[var(--danger)] transition-colors"
+                        aria-label={`Remove ${tag}`}
+                      >
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          viewBox="0 0 12 12"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M3 3l6 6M9 3L3 9" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="mt-1 text-xs text-[var(--muted)]">
+                Up to 10 tags
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Description Input */}
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-[var(--muted)] mb-1"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            rows="2"
-            value={formData.description}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
-            placeholder="Briefly describe what this snippet does..."
-          />
-        </div>
-
-        {/* Code Input */}
-        <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-[var(--muted)] mb-1"
-          >
-            Code
-          </label>
-          <textarea
-            id="code"
-            name="code"
-            required
-            rows="10"
-            value={formData.code}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] font-mono text-sm disabled:opacity-60"
-            placeholder="Paste your code here..."
-          />
-        </div>
-
-        {/* Public Checkbox */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="isPublic"
-            name="isPublic"
-            checked={formData.isPublic}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="h-4 w-4 border border-[var(--border)] bg-[var(--surface)] cursor-pointer"
-          />
-          <label htmlFor="isPublic" className="text-sm text-[var(--muted)] cursor-pointer">
-            Make this snippet public
-          </label>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="border border-red-500 bg-[var(--surface)] p-4">
-            <p className="text-sm text-red-600 font-medium">{error}</p>
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-[var(--text)] mb-1.5"
+            >
+              Description
+              <span className="text-[var(--muted)] font-normal ml-1">
+                (optional)
+              </span>
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows="2"
+              value={formData.description}
+              onChange={handleChange}
+              disabled={isLoading}
+              className="input resize-none"
+              placeholder="Briefly describe what this snippet does..."
+            />
           </div>
-        )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className={`w-full py-3 px-4 border font-semibold ${
-            isLoading
-              ? "border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] cursor-not-allowed"
-              : "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
-          }`}
-        >
-          {isLoading ? "Creating..." : "Create Snippet"}
-        </button>
-      </form>
+          <div>
+            <label
+              htmlFor="code"
+              className="block text-sm font-medium text-[var(--text)] mb-1.5"
+            >
+              Code
+            </label>
+            <textarea
+              id="code"
+              name="code"
+              required
+              rows="12"
+              value={formData.code}
+              onChange={handleChange}
+              disabled={isLoading}
+              className="input font-mono text-sm resize-none"
+              placeholder="Paste your code here..."
+            />
+          </div>
+
+          <div className="flex items-center gap-3 py-2">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                id="isPublic"
+                name="isPublic"
+                checked={formData.isPublic}
+                onChange={handleChange}
+                disabled={isLoading}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-[var(--border)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+            </label>
+            <label htmlFor="isPublic" className="text-sm text-[var(--text)] cursor-pointer">
+              Make this snippet public
+            </label>
+          </div>
+
+          {error && (
+            <div className="p-3 rounded-md bg-[var(--danger-muted)] border border-[var(--danger)] text-sm text-[var(--danger)]">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="btn btn-primary w-full py-2.5"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 spin" viewBox="0 0 24 24" fill="none">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    className="opacity-25"
+                  />
+                  <path
+                    d="M12 2a10 10 0 0 1 10 10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    className="opacity-75"
+                  />
+                </svg>
+                Creating...
+              </span>
+            ) : (
+              "Create Snippet"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
