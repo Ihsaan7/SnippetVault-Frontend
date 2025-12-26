@@ -32,16 +32,22 @@ export function PublicSnippets() {
     }, 250);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, language]);
 
   const { totalPages = 1 } = pagination || {};
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6 gap-4">
-          <h1 className="text-3xl font-bold text-white">Public Snippets</h1>
-          <div className="flex items-center gap-2">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+      <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-semibold">Public Snippets</h1>
+            <p className="text-sm text-[var(--muted)]">
+              Browse and fork. Share uses native share / WhatsApp / copy fallback.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
             <input
               type="text"
               value={search}
@@ -50,7 +56,7 @@ export function PublicSnippets() {
                 setPage(1);
               }}
               placeholder="Search public snippets..."
-              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white w-full md:w-64"
+              className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] w-full md:w-64 focus:outline-none focus:border-[var(--accent)]"
             />
             <input
               type="text"
@@ -60,24 +66,26 @@ export function PublicSnippets() {
                 setPage(1);
               }}
               placeholder="Language"
-              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white w-full md:w-40"
+              className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] w-full md:w-40 focus:outline-none focus:border-[var(--accent)]"
             />
           </div>
         </div>
 
         {isLoading && (
-          <div className="text-slate-300 text-center py-8">Loading...</div>
+          <div className="border border-[var(--border)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">
+            Loading...
+          </div>
         )}
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-300 p-4 rounded-lg mb-4">
+          <div className="border border-red-500 bg-[var(--surface)] p-4 text-red-600">
             {error}
           </div>
         )}
 
         {!isLoading && !error && snippets?.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-slate-400 text-lg">No public snippets found.</p>
+          <div className="border border-[var(--border)] bg-[var(--surface)] p-8">
+            <p className="text-[var(--muted)]">No public snippets found.</p>
           </div>
         )}
 
@@ -94,15 +102,15 @@ export function PublicSnippets() {
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 mt-6">
+        <div className="flex items-center justify-end gap-3">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1 || isLoading}
-            className="px-3 py-1 rounded bg-slate-700 text-white disabled:opacity-50"
+            className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
           >
             Prev
           </button>
-          <span className="text-slate-300 text-sm">
+          <span className="text-[var(--muted)] text-sm">
             Page {page} of {totalPages || 1}
           </span>
           <button
@@ -110,7 +118,7 @@ export function PublicSnippets() {
               setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
             }
             disabled={isLoading || (totalPages && page >= totalPages)}
-            className="px-3 py-1 rounded bg-slate-700 text-white disabled:opacity-50"
+            className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
           >
             Next
           </button>
