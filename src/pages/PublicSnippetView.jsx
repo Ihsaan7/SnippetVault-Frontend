@@ -13,6 +13,7 @@ export function PublicSnippetView() {
   const [snippet, setSnippet] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [forking, setForking] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -27,23 +28,22 @@ export function PublicSnippetView() {
         setIsLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6">
-        <div className="max-w-4xl mx-auto border border-[var(--border)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">
-          Loading...
-        </div>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="skeleton h-8 w-1/2 rounded"></div>
+        <div className="skeleton h-4 w-1/3 rounded"></div>
+        <div className="skeleton h-64 rounded-md"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6">
-        <div className="max-w-3xl mx-auto border border-red-500 bg-[var(--surface)] p-4 text-red-600">
+      <div className="max-w-4xl mx-auto">
+        <div className="card p-6 border-[var(--danger)] bg-[var(--danger-muted)] text-[var(--danger)]">
           {error}
         </div>
       </div>
@@ -54,21 +54,79 @@ export function PublicSnippetView() {
 
   const shareUrl = `${window.location.origin}/public/snippets/${snippet._id}`;
 
+  const handleFork = async () => {
+    if (!isVerified) {
+      navigate("/login");
+      return;
+    }
+    try {
+      setForking(true);
+      const fork = await forkPublicSnippet(snippet._id);
+      navigate(`/dashboard/snippets/${fork._id}/edit`);
+    } catch {
+      // ignore
+    } finally {
+      setForking(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <button
+        onClick={() => navigate("/public/snippets")}
+        className="btn btn-ghost text-sm -ml-2"
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          viewBox="0 0 16 16"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <path d="M10 4L6 8l4 4" />
+        </svg>
+        Back to explore
+      </button>
+
+      <div className="card p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
           <div>
-            <h1 className="text-2xl font-semibold">{snippet.title}</h1>
-            <p className="text-[var(--muted)] text-sm">
-              {snippet.codeLanguage}
-              {snippet.owner?.username ? ` • by ${snippet.owner.username}` : ""}
-            </p>
+            <h1 className="text-2xl font-semibold text-[var(--text)]">
+              {snippet.title}
+            </h1>
+            <div className="flex items-center gap-3 mt-2 text-sm text-[var(--muted)]">
+              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-[var(--surface-2)] text-[var(--text-secondary)]">
+                {snippet.codeLanguage}
+              </span>
+              {snippet.owner?.username && (
+                <span className="flex items-center gap-1">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 16 16"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <circle cx="8" cy="5" r="2.5" />
+                    <path d="M3 14c0-2.5 2.5-4 5-4s5 1.5 5 4" />
+                  </svg>
+                  {snippet.owner.username}
+                </span>
+              )}
+              {snippet.createdAt && (
+                <span>
+                  {new Date(snippet.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2">
             <button
               onClick={async () => {
-                // Prefer native share; fallback to WhatsApp + copy
                 if (navigator.share) {
                   try {
                     await navigator.share({
@@ -98,35 +156,86 @@ export function PublicSnippetView() {
                   // ignore
                 }
               }}
-              className="px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              className="btn btn-secondary"
             >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 16 16"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M6 10l4-4M6 6h4v4M3 9v3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9" />
+              </svg>
               Share
             </button>
 
             <button
-              onClick={async () => {
-                if (!isVerified) {
-                  navigate("/login");
-                  return;
-                }
-                const fork = await forkPublicSnippet(snippet._id);
-                navigate(`/dashboard/snippets/${fork._id}/edit`);
-              }}
-              className="px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] text-sm font-semibold hover:brightness-95 active:translate-y-px"
+              onClick={handleFork}
+              disabled={forking}
+              className="btn btn-primary"
             >
-              Fork
+              {forking ? (
+                <>
+                  <svg className="w-4 h-4 spin" viewBox="0 0 24 24" fill="none">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="opacity-25"
+                    />
+                    <path
+                      d="M12 2a10 10 0 0 1 10 10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      className="opacity-75"
+                    />
+                  </svg>
+                  Forking...
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 16 16"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <circle cx="8" cy="3" r="1.5" />
+                    <circle cx="4" cy="12" r="1.5" />
+                    <circle cx="12" cy="12" r="1.5" />
+                    <path d="M8 4.5v4l-4 3m8-3l-4-3" />
+                  </svg>
+                  Fork
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {snippet.description && (
-          <p className="text-[var(--text)]/80">{snippet.description}</p>
+          <p className="text-[var(--text-secondary)] mb-6">{snippet.description}</p>
+        )}
+
+        {snippet.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-6">
+            {snippet.tags.map((tag, i) => (
+              <span key={`${tag}-${i}`} className="tag">
+                {tag}
+              </span>
+            ))}
+          </div>
         )}
 
         <CodeBlock
           code={snippet.code}
           language={snippet.codeLanguage}
-          className="bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-4 text-sm"
+          className="bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-4 text-sm rounded-md"
         />
       </div>
     </div>
