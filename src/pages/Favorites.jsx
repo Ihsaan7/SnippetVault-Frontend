@@ -23,75 +23,78 @@ export function Favorites() {
   }, [page]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6 gap-4">
-          <h1 className="text-3xl font-bold text-white">Favorites</h1>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold">Favorites</h1>
+          <p className="text-sm text-[var(--muted)]">
+            Your saved snippets. Click code to copy.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/dashboard/snippets")}
+          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm hover:border-[var(--accent)] hover:text-[var(--accent)]"
+        >
+          Back to Snippets
+        </button>
+      </div>
+
+      {isLoading && (
+        <div className="border border-[var(--border)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">
+          Loading favorites...
+        </div>
+      )}
+
+      {error && (
+        <div className="border border-red-500 bg-[var(--surface)] p-4 text-red-600">
+          {error}
+        </div>
+      )}
+
+      {!isLoading && !error && snippets?.length === 0 && (
+        <div className="border border-[var(--border)] bg-[var(--surface)] p-8">
+          <p className="text-[var(--muted)]">No favorites yet.</p>
           <button
             onClick={() => navigate("/dashboard/snippets")}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+            className="mt-4 px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
           >
-            Back to Snippets
+            Browse your snippets
           </button>
         </div>
+      )}
 
-        {isLoading && (
-          <div className="text-slate-300 text-center py-8">
-            Loading favorites...
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-300 p-4 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
-        {!isLoading && !error && snippets?.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-slate-400 text-lg mb-4">No favorites yet.</p>
-            <button
-              onClick={() => navigate("/dashboard/snippets")}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-            >
-              Browse your snippets
-            </button>
-          </div>
-        )}
-
-        {!isLoading && snippets?.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {snippets.map((s) => (
-              <SnippetCard
-                key={s._id}
-                snippet={s}
-                onFavorite={() => toggleFavorite(s._id)}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center justify-end gap-3 mt-6">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1 || isLoading}
-            className="px-3 py-1 rounded bg-slate-700 text-white disabled:opacity-50"
-          >
-            Prev
-          </button>
-          <span className="text-slate-300 text-sm">
-            Page {page} of {totalPages || 1}
-          </span>
-          <button
-            onClick={() =>
-              setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
-            }
-            disabled={isLoading || (totalPages && page >= totalPages)}
-            className="px-3 py-1 rounded bg-slate-700 text-white disabled:opacity-50"
-          >
-            Next
-          </button>
+      {!isLoading && snippets?.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {snippets.map((s) => (
+            <SnippetCard
+              key={s._id}
+              snippet={s}
+              onFavorite={() => toggleFavorite(s._id)}
+            />
+          ))}
         </div>
+      )}
+
+      <div className="flex items-center justify-end gap-3">
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page <= 1 || isLoading}
+          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
+        >
+          Prev
+        </button>
+        <span className="text-[var(--muted)] text-sm">
+          Page {page} of {totalPages || 1}
+        </span>
+        <button
+          onClick={() =>
+            setPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1))
+          }
+          disabled={isLoading || (totalPages && page >= totalPages)}
+          className="px-3 py-2 border border-[var(--border)] bg-[var(--surface)] text-sm disabled:opacity-50 hover:border-[var(--accent)]"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

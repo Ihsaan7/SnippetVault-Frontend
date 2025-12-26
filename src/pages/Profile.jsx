@@ -152,231 +152,211 @@ export function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <h1 className="text-4xl font-bold text-white mb-8">Your Profile</h1>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold">Profile</h1>
+          <p className="text-sm text-[var(--muted)]">Account details and security.</p>
+        </div>
+      </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="text-slate-300 text-center py-12">
-            Loading profile...
-          </div>
-        )}
+      {loading && (
+        <div className="border border-[var(--border)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">
+          Loading profile...
+        </div>
+      )}
 
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-300 p-4 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="border border-red-500 bg-[var(--surface)] p-4 text-red-600">
+          {error}
+        </div>
+      )}
 
-        {/* Submit Message */}
-        {submitMessage && (
-          <div
-            className={`p-4 rounded-lg mb-6 ${
-              submitMessage.includes("success")
-                ? "bg-green-500/10 border border-green-500 text-green-300"
-                : "bg-yellow-500/10 border border-yellow-500 text-yellow-300"
-            }`}
-          >
-            {submitMessage}
-          </div>
-        )}
+      {submitMessage && (
+        <div
+          className={`border p-4 ${
+            submitMessage.includes("success")
+              ? "border-[var(--accent-2)] bg-[var(--surface)] text-[var(--text)]"
+              : "border-[var(--border)] bg-[var(--surface)] text-[var(--text)]"
+          }`}
+        >
+          {submitMessage}
+        </div>
+      )}
 
-        {/* Content */}
-        {!loading && !error && (
-          <div className="space-y-8">
-            {/* Profile Display Section */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Profile Information
-              </h2>
-              <div className="flex gap-6">
-                {/* Avatar */}
-                <div className="flex-shrink-0">
-                  <img
-                    src={user.avatar}
-                    alt={user.username}
-                    className="w-24 h-24 rounded-full border-2 border-blue-500 object-cover"
-                  />
-                </div>
-                {/* User Info */}
-                <div className="flex-grow">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-slate-400 text-sm">Username</p>
-                      <p className="text-white font-semibold">
-                        {user.username}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-slate-400 text-sm">Full Name</p>
-                      <p className="text-white font-semibold">
-                        {user.fullName}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-slate-400 text-sm">Email</p>
-                      <p className="text-white font-semibold">{user.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-400 text-sm">Member Since</p>
-                      <p className="text-white font-semibold">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
+      {!loading && !error && (
+        <div className="grid gap-6">
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-6">
+            <h2 className="text-lg font-semibold mb-4">Profile Information</h2>
+            <div className="flex gap-6 flex-wrap">
+              <div className="flex-shrink-0">
+                <img
+                  src={user.avatar}
+                  alt={user.username}
+                  className="w-24 h-24 border border-[var(--border)] object-cover"
+                />
+              </div>
+              <div className="flex-grow">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[var(--muted)] text-sm">Username</p>
+                    <p className="text-[var(--text)] font-semibold">{user.username}</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--muted)] text-sm">Full Name</p>
+                    <p className="text-[var(--text)] font-semibold">{user.fullName}</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--muted)] text-sm">Email</p>
+                    <p className="text-[var(--text)] font-semibold">{user.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--muted)] text-sm">Member Since</p>
+                    <p className="text-[var(--text)] font-semibold">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Update Profile Form */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Update Profile
-              </h2>
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
-                <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    value={updateProfileForm.fullName}
-                    onChange={(e) =>
-                      setUpdateProfileForm({
-                        ...updateProfileForm,
-                        fullName: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={updateProfileForm.email}
-                    onChange={(e) =>
-                      setUpdateProfileForm({
-                        ...updateProfileForm,
-                        email: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg transition"
-                >
-                  {submitting ? "Updating..." : "Update Profile"}
-                </button>
-              </form>
-            </div>
-
-            {/* Change Password Form */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Change Password
-              </h2>
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Current Password
-                  </label>
-                  <input
-                    type="password"
-                    value={changePasswordForm.oldPass}
-                    onChange={(e) =>
-                      setChangePasswordForm({
-                        ...changePasswordForm,
-                        oldPass: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                    placeholder="Enter current password"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    value={changePasswordForm.newPass}
-                    onChange={(e) =>
-                      setChangePasswordForm({
-                        ...changePasswordForm,
-                        newPass: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                    placeholder="Enter new password"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Confirm New Password
-                  </label>
-                  <input
-                    type="password"
-                    value={changePasswordForm.confirmPassword}
-                    onChange={(e) =>
-                      setChangePasswordForm({
-                        ...changePasswordForm,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                    placeholder="Confirm new password"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg transition"
-                >
-                  {submitting ? "Changing..." : "Change Password"}
-                </button>
-              </form>
-            </div>
-
-            {/* Update Avatar Form */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Update Avatar
-              </h2>
-              <form onSubmit={handleUpdateAvatar} className="space-y-4">
-                <div>
-                  <label className="block text-slate-300 text-sm font-medium mb-2">
-                    Select Image
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={submitting || !avatarFile}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg transition"
-                >
-                  {submitting ? "Uploading..." : "Update Avatar"}
-                </button>
-              </form>
-            </div>
           </div>
-        )}
-      </div>
+
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-6">
+            <h2 className="text-lg font-semibold mb-4">Update Profile</h2>
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div>
+                <label className="block text-[var(--muted)] text-sm font-medium mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={updateProfileForm.fullName}
+                  onChange={(e) =>
+                    setUpdateProfileForm({
+                      ...updateProfileForm,
+                      fullName: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <label className="block text-[var(--muted)] text-sm font-medium mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={updateProfileForm.email}
+                  onChange={(e) =>
+                    setUpdateProfileForm({
+                      ...updateProfileForm,
+                      email: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
+                  placeholder="Enter your email"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] font-semibold disabled:opacity-50 hover:brightness-95 active:translate-y-px"
+              >
+                {submitting ? "Updating..." : "Update Profile"}
+              </button>
+            </form>
+          </div>
+
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-6">
+            <h2 className="text-lg font-semibold mb-4">Change Password</h2>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-[var(--muted)] text-sm font-medium mb-2">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  value={changePasswordForm.oldPass}
+                  onChange={(e) =>
+                    setChangePasswordForm({
+                      ...changePasswordForm,
+                      oldPass: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div>
+                <label className="block text-[var(--muted)] text-sm font-medium mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={changePasswordForm.newPass}
+                  onChange={(e) =>
+                    setChangePasswordForm({
+                      ...changePasswordForm,
+                      newPass: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <label className="block text-[var(--muted)] text-sm font-medium mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={changePasswordForm.confirmPassword}
+                  onChange={(e) =>
+                    setChangePasswordForm({
+                      ...changePasswordForm,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] font-semibold disabled:opacity-50 hover:brightness-95 active:translate-y-px"
+              >
+                {submitting ? "Changing..." : "Change Password"}
+              </button>
+            </form>
+          </div>
+
+          <div className="bg-[var(--surface)] border border-[var(--border)] p-6">
+            <h2 className="text-lg font-semibold mb-4">Update Avatar</h2>
+            <form onSubmit={handleUpdateAvatar} className="space-y-4">
+              <div>
+                <label className="block text-[var(--muted)] text-sm font-medium mb-2">
+                  Select Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                  className="w-full px-4 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] text-sm file:mr-4 file:py-2 file:px-4 file:border file:border-[var(--border)] file:bg-[var(--surface-2)] file:text-[var(--text)] hover:file:border-[var(--accent)]"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submitting || !avatarFile}
+                className="w-full px-4 py-2 border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] font-semibold disabled:opacity-50 hover:brightness-95 active:translate-y-px"
+              >
+                {submitting ? "Uploading..." : "Update Avatar"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
