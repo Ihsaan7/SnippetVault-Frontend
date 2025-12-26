@@ -41,12 +41,12 @@ export function RegisterationForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
+      <div className="max-w-md w-full bg-[var(--surface)] border border-[var(--border)] p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Create Account</h2>
-          <p className="text-gray-500 mt-2 text-sm">Join SnippetVault today</p>
+          <h2 className="text-2xl font-semibold">Create Account</h2>
+          <p className="text-[var(--muted)] mt-2 text-sm">Join SnippetVault today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -54,7 +54,7 @@ export function RegisterationForm() {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Username
             </label>
@@ -66,7 +66,7 @@ export function RegisterationForm() {
               onChange={handleChange}
               required
               disabled={isLoading} // Use local state here
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
               placeholder="johndoe123"
             />
           </div>
@@ -75,7 +75,7 @@ export function RegisterationForm() {
           <div>
             <label
               htmlFor="fullName"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Full Name
             </label>
@@ -87,7 +87,7 @@ export function RegisterationForm() {
               onChange={handleChange}
               required
               disabled={isLoading} // Use local state here
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
               placeholder="johndoe123"
             />
           </div>
@@ -96,7 +96,7 @@ export function RegisterationForm() {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Email Address
             </label>
@@ -108,7 +108,7 @@ export function RegisterationForm() {
               onChange={handleChange}
               required
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
               placeholder="john@example.com"
             />
           </div>
@@ -117,7 +117,7 @@ export function RegisterationForm() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Password
             </label>
@@ -130,10 +130,10 @@ export function RegisterationForm() {
               required
               minLength={6}
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60"
               placeholder="••••••••"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[var(--muted)] mt-1">
               Must be at least 6 characters
             </p>
           </div>
@@ -142,7 +142,7 @@ export function RegisterationForm() {
           <div>
             <label
               htmlFor="avatar"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Profile Picture
             </label>
@@ -153,17 +153,17 @@ export function RegisterationForm() {
               onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
               required
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400 text-sm"
+              className="w-full px-4 py-2 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)] disabled:opacity-60 text-sm"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[var(--muted)] mt-1">
               Upload an image file for your profile
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-              <p className="text-sm text-red-700 font-medium">{error}</p>
+            <div className="border border-red-500 bg-[var(--surface)] p-4">
+              <p className="text-sm text-red-600 font-medium">{error}</p>
             </div>
           )}
 
@@ -171,11 +171,10 @@ export function RegisterationForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg text-white font-semibold shadow-md transition-colors
-            ${
+            className={`w-full py-3 px-4 border font-semibold ${
               isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                ? "border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] cursor-not-allowed"
+                : "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
             }`}
           >
             {isLoading ? (
