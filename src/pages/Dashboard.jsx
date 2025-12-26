@@ -38,7 +38,7 @@ export function Dashboard() {
           {user?.username ? `Dashboard — ${user.username}` : "Dashboard"}
         </h1>
         <p className="text-sm text-[var(--muted)]">
-          Clean UI, sharp edges, theme-aware.
+          GitHub-dark UI, sharp edges, modern typography.
         </p>
       </div>
 
@@ -113,7 +113,7 @@ export function Dashboard() {
       </div>
 
       <div className="text-xs text-[var(--muted)]">
-        Theme + palette can be changed from the sidebar. (Auto follows browser.)
+        Tip: click any code block to copy.
       </div>
     </div>
   );

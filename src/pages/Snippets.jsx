@@ -1,7 +1,33 @@
 import { useNavigate } from "react-router-dom";
 import { useSnippet } from "../context/SnippetContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SnippetCard from "../components/snippets/SnippetCard";
+
+function DateField({ value, onChange, title }) {
+  const ref = useRef(null);
+
+  return (
+    <div className="flex items-stretch border border-[var(--border)] bg-[var(--surface)] focus-within:border-[var(--accent)]">
+      <input
+        ref={ref}
+        type="date"
+        value={value}
+        onChange={onChange}
+        title={title}
+        lang="en-CA"
+        className="px-3 py-2 bg-transparent text-[var(--text)] text-sm focus:outline-none appearance-none"
+      />
+      <button
+        type="button"
+        onClick={() => ref.current?.showPicker?.()}
+        className="px-3 border-l border-[var(--border)] text-xs text-[var(--muted)] hover:text-[var(--accent)]"
+        title="Open calendar"
+      >
+        Pick
+      </button>
+    </div>
+  );
+}
 
 export function Snippets() {
   const {
@@ -137,24 +163,20 @@ export function Snippets() {
             className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] w-full md:w-40 focus:outline-none focus:border-[var(--accent)]"
           />
 
-          <input
-            type="date"
+          <DateField
             value={from}
             onChange={(e) => {
               setFrom(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)]"
             title="From"
           />
-          <input
-            type="date"
+          <DateField
             value={to}
             onChange={(e) => {
               setTo(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] focus:outline-none focus:border-[var(--accent)]"
             title="To"
           />
         </div>

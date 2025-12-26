@@ -138,7 +138,7 @@ export default function SnippetEdit() {
           <div>
             <label
               htmlFor="tags"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-[var(--muted)] mb-1"
             >
               Tags (comma separated)
             </label>
