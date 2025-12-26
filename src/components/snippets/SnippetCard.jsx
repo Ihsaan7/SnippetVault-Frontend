@@ -45,27 +45,29 @@ export default function SnippetCard({
   };
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-lg p-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-white text-lg font-semibold">{title}</h3>
-          <p className="text-slate-400 text-sm">{codeLanguage}</p>
+    <div className="bg-[var(--surface)] border border-[var(--border)] p-5 hover:border-[var(--accent)] hover:translate-y-[-1px]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-[var(--text)] text-lg font-semibold truncate">
+            {title}
+          </h3>
+          <p className="text-[var(--muted)] text-sm">{codeLanguage}</p>
         </div>
         {createdAt && (
-          <span className="text-slate-500 text-xs">
+          <span className="text-[var(--muted)] text-xs whitespace-nowrap">
             {new Date(createdAt).toLocaleDateString()}
           </span>
         )}
       </div>
 
       {description && (
-        <p className="text-slate-300 mt-2 text-sm">{description}</p>
+        <p className="text-[var(--text)]/80 mt-2 text-sm">{description}</p>
       )}
 
       <CodeBlock
         code={preview}
         language={codeLanguage}
-        className="mt-3 bg-slate-900 text-slate-200 rounded p-3 text-xs overflow-x-auto"
+        className="mt-3 bg-[var(--code-bg)] text-[var(--code-text)] border border-[var(--border)] p-3 text-xs overflow-x-auto"
       />
 
       {tagList.length > 0 && (
@@ -81,7 +83,7 @@ export default function SnippetCard({
               onTouchEnd={cancelLongPress}
               title="Hold to filter by tag"
               aria-label={`Tag ${t}: hold to filter`}
-              className="px-2 py-1 text-xs rounded border transition cursor-pointer bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600"
+              className="px-2 py-1 text-xs border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]/80 hover:border-[var(--accent)] hover:text-[var(--accent)]"
             >
               {t}
             </button>
@@ -91,7 +93,7 @@ export default function SnippetCard({
 
       <div className="flex gap-2 justify-end mt-3 flex-wrap">
         {typeof favoriteCount === "number" && (
-          <span className="mr-auto text-xs text-slate-400 self-center">
+          <span className="mr-auto text-xs text-[var(--muted)] self-center">
             Favorites: {favoriteCount}
           </span>
         )}
@@ -101,15 +103,38 @@ export default function SnippetCard({
             type="button"
             onClick={async () => {
               const url = `${window.location.origin}/public/snippets/${snippet._id}`;
+
+              // 1) Native share (mobile + modern browsers). Requires secure context.
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: snippet.title || "Snippet",
+                    text: "Check this snippet",
+                    url,
+                  });
+                  return;
+                } catch {
+                  // user cancelled or unsupported -> continue to fallback
+                }
+              }
+
+              // 2) WhatsApp Web fallback (works on desktop too)
+              const wa = `https://wa.me/?text=${encodeURIComponent(url)}`;
+              try {
+                window.open(wa, "_blank", "noopener,noreferrer");
+              } catch {
+                // ignore
+              }
+
+              // 3) Also copy to clipboard as a reliable fallback
               try {
                 await navigator.clipboard.writeText(url);
               } catch {
-                // fallback: still open the link in a new tab
-                window.open(url, "_blank", "noopener,noreferrer");
+                // ignore
               }
             }}
-            className="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-white transition"
-            title="Copy public link"
+            className="px-3 py-1 text-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            title="Share"
           >
             Share
           </button>
@@ -119,10 +144,10 @@ export default function SnippetCard({
           <button
             type="button"
             onClick={() => onFavorite(snippet)}
-            className={`px-3 py-1 text-xs rounded transition ${
+            className={`px-3 py-1 text-xs border transition ${
               isFavorited
-                ? "bg-yellow-500 hover:bg-yellow-600 text-black"
-                : "bg-slate-700 hover:bg-slate-600 text-white"
+                ? "bg-[var(--accent-2)] border-[var(--accent-2)] text-[var(--accent-contrast)] hover:brightness-95"
+                : "bg-[var(--surface)] border-[var(--border)] text-[var(--text)] hover:border-[var(--accent-2)]"
             }`}
           >
             {isFavorited ? "★ Favorited" : "☆ Favorite"}
@@ -132,7 +157,7 @@ export default function SnippetCard({
         {onEdit && (
           <button
             onClick={() => onEdit(snippet)}
-            className="px-3 py-1 text-xs rounded bg-blue-600 hover:bg-blue-700 text-white transition"
+            className="px-3 py-1 text-xs border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] hover:brightness-95 active:translate-y-px"
           >
             {editLabel}
           </button>
@@ -140,7 +165,7 @@ export default function SnippetCard({
         {onDelete && (
           <button
             onClick={() => onDelete(snippet)}
-            className="px-3 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white transition"
+            className="px-3 py-1 text-xs border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-red-500 hover:text-red-500"
           >
             Delete
           </button>
