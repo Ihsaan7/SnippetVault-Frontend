@@ -31,13 +31,23 @@ export const SnippetProvider = ({ children }) => {
     }
   };
 
-  const getSnippets = async ({ page = 1, limit = 6, search = "" } = {}) => {
+  const getSnippets = async ({
+    page = 1,
+    limit = 6,
+    search = "",
+    tags = [],
+  } = {}) => {
     setIsLoading(true);
     setError(null);
 
     try {
       const response = await apiConfig.get("/snippets", {
-        params: { page, limit, search },
+        params: {
+          page,
+          limit,
+          search,
+          tags: Array.isArray(tags) ? tags.join(",") : tags,
+        },
       });
       if (response && response.data && response.data.data.snippets) {
         setSnippets(response.data.data.snippets);
@@ -50,6 +60,26 @@ export const SnippetProvider = ({ children }) => {
       console.error("FRONTEND_FETCHING-ALL_CONTEXT");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getAllTags = async () => {
+    try {
+      const response = await apiConfig.get("/snippets/tags");
+      return response?.data?.data?.tags || [];
+    } catch (err) {
+      console.error("FRONTEND_TAGS_FETCH_CONTEXT", err);
+      return [];
+    }
+  };
+
+  const getTagStats = async () => {
+    try {
+      const response = await apiConfig.get("/snippets/tags/stats");
+      return response?.data?.data?.stats || [];
+    } catch (err) {
+      console.error("FRONTEND_TAGS_STATS_FETCH_CONTEXT", err);
+      return [];
     }
   };
 
@@ -116,6 +146,8 @@ export const SnippetProvider = ({ children }) => {
         createSnippet,
         getSnippetByID,
         getSnippets,
+        getAllTags,
+        getTagStats,
         updateSnippet,
         deleteSnippet,
       }}

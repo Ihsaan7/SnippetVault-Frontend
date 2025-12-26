@@ -4,24 +4,40 @@ import { useEffect, useState } from "react";
 import SnippetCard from "../components/snippets/SnippetCard";
 
 export function Snippets() {
-  const { snippets, isLoading, error, getSnippets, deleteSnippet, pagination } =
-    useSnippet();
+  const {
+    snippets,
+    isLoading,
+    error,
+    getSnippets,
+    deleteSnippet,
+    pagination,
+    getAllTags,
+  } = useSnippet();
   const { totalPages = 1 } = pagination || {};
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
   const [search, setSearch] = useState("");
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getSnippets();
+    // initial load: fetch tags
+    (async () => {
+      const tags = await getAllTags();
+      setAvailableTags(tags);
+    })();
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
-      getSnippets(page, limit, search);
-    }, 300);
+      getSnippets({ page, limit, search, tags: selectedTags });
+    }, 250);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [page, limit, search]);
+  }, [page, limit, search, selectedTags]);
 
   const handleEdit = (snippet) => {
     navigate(`/dashboard/snippets/${snippet._id}/edit`);
@@ -37,12 +53,19 @@ export function Snippets() {
     setPage(1);
   };
 
+  const toggleTag = (tag) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+    setPage(1);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 gap-4">
           <h1 className="text-3xl font-bold text-white">Your Snippets</h1>
-          <div>
+          <div className="flex items-center gap-2">
             <input
               type="text"
               value={search}
@@ -59,6 +82,36 @@ export function Snippets() {
             + New Snippet
           </button>
         </div>
+
+        {/* Tag Filters */}
+        {availableTags.length > 0 && (
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((t) => {
+                const active = selectedTags.includes(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => toggleTag(t)}
+                    className={`px-3 py-1 rounded text-xs border transition ${
+                      active
+                        ? "bg-blue-600 text-white border-blue-500"
+                        : "bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+            {selectedTags.length > 0 && (
+              <p className="mt-2 text-xs text-slate-400">
+                Filtering by: {selectedTags.join(", ")}
+              </p>
+            )}
+          </div>
+        )}
 
         {isLoading && (
           <div className="text-slate-300 text-center py-8">
@@ -94,6 +147,7 @@ export function Snippets() {
                 snippet={s}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onTagLongPress={toggleTag}
               />
             ))}
           </div>
