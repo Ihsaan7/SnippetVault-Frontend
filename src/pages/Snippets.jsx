@@ -7,7 +7,7 @@ function DateField({ value, onChange, title, placeholder }) {
   const ref = useRef(null);
 
   return (
-    <div className="relative">
+    <div className="relative w-full sm:w-40">
       <input
         ref={ref}
         type="date"
@@ -207,7 +207,7 @@ export function Snippets() {
               setPage(1);
             }}
             placeholder="Language"
-            className="input w-32"
+            className="input w-full sm:w-32"
           />
           <DateField
             value={from}
@@ -326,7 +326,7 @@ export function Snippets() {
       )}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1 || isLoading}

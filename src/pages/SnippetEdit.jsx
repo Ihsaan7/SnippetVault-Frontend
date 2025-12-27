@@ -116,7 +116,7 @@ export default function SnippetEdit() {
         <div className="skeleton h-8 w-1/3 rounded"></div>
         <div className="card p-6 space-y-4">
           <div className="skeleton h-10 w-full rounded"></div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="skeleton h-10 rounded"></div>
             <div className="skeleton h-10 rounded"></div>
           </div>
@@ -285,7 +285,7 @@ export default function SnippetEdit() {
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               type="submit"
               disabled={isLoading}

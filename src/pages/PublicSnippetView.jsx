@@ -124,7 +124,7 @@ export function PublicSnippetView() {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap w-full sm:w-auto sm:justify-end">
             <button
               onClick={async () => {
                 if (navigator.share) {
@@ -156,7 +156,7 @@ export function PublicSnippetView() {
                   // ignore
                 }
               }}
-              className="btn btn-secondary"
+              className="btn btn-secondary w-full sm:w-auto"
             >
               <svg
                 className="w-4 h-4"
@@ -173,7 +173,7 @@ export function PublicSnippetView() {
             <button
               onClick={handleFork}
               disabled={forking}
-              className="btn btn-primary"
+              className="btn btn-primary w-full sm:w-auto"
             >
               {forking ? (
                 <>
