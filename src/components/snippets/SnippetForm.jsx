@@ -1,6 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import hljs from "highlight.js";
 import { useSnippet } from "../../context/SnippetContext";
+
+const normalizeTags = (raw) => {
+  const arr = Array.isArray(raw) ? raw : [];
+  return [...new Set(arr.map((t) => String(t).toLowerCase().trim()).filter(Boolean))];
+};
 
 export function SnippetForm({ onSuccess, initialValues }) {
   const [formData, setFormData] = useState({
@@ -11,17 +16,9 @@ export function SnippetForm({ onSuccess, initialValues }) {
     isPublic: initialValues?.isPublic || false,
   });
   const [languageManuallySet, setLanguageManuallySet] = useState(false);
-  const [tags, setTags] = useState(initialValues?.tags || []);
+  const [tags, setTags] = useState(() => normalizeTags(initialValues?.tags));
   const [tagInput, setTagInput] = useState("");
   const { isLoading, error, createSnippet } = useSnippet();
-
-  useEffect(() => {
-    if (initialValues?.tags?.length) {
-      setTags([
-        ...new Set(initialValues.tags.map((t) => t.toLowerCase().trim())),
-      ]);
-    }
-  }, [initialValues]);
 
   const sanitizeTag = (t) => t.toLowerCase().trim();
   const addTag = (raw) => {

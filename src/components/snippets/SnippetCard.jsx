@@ -128,12 +128,12 @@ export default function SnippetCard({
       )}
 
       <div
-        className={`flex items-center gap-2 mt-4 pt-3 border-t border-[var(--border)] transition-opacity duration-200 ${
+        className={`flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-[var(--border)] transition-opacity duration-200 ${
           isHovered ? "opacity-100" : "opacity-70"
         }`}
       >
         {typeof favoriteCount === "number" && (
-          <span className="flex items-center gap-1 text-xs text-[var(--muted)] mr-auto">
+          <span className="w-full sm:w-auto flex items-center gap-1 text-xs text-[var(--muted)] sm:mr-auto">
             <svg
               className="w-3.5 h-3.5"
               fill={isFavorited ? "currentColor" : "none"}
