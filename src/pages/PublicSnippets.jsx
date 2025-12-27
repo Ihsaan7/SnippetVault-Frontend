@@ -83,7 +83,7 @@ export function PublicSnippets() {
               setPage(1);
             }}
             placeholder="Language"
-            className="input w-32"
+            className="input w-full sm:w-32"
           />
         </div>
       </div>
@@ -145,7 +145,7 @@ export function PublicSnippets() {
       )}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1 || isLoading}

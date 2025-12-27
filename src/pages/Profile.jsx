@@ -215,7 +215,7 @@ export function Profile() {
                   className="w-20 h-20 rounded-full border-2 border-[var(--border)] object-cover"
                 />
               </div>
-              <div className="flex-grow grid grid-cols-2 gap-4 text-sm">
+              <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-[var(--muted)]">Username</p>
                   <p className="font-medium text-[var(--text)]">@{user.username}</p>
