@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -109,10 +110,96 @@ function NavItem({ to, label, icon, end }) {
   );
 }
 
+function SidebarPanel({
+  className = "",
+  user,
+  isVerified,
+  isLoading,
+  isDark,
+  toggleTheme,
+  onLogout,
+}) {
+  return (
+    <aside
+      className={`border-r border-[var(--border)] bg-[var(--surface)] flex flex-col ${className}`}
+    >
+      <div className="p-4 border-b border-[var(--border)]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-[var(--accent)] flex items-center justify-center">
+            <span className="text-xs font-bold text-white">SV</span>
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-[var(--text)]">SnippetVault</div>
+            <div className="text-xs text-[var(--muted)]">
+              {user?.username ? `@${user.username}` : "Code snippets"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <div className="mb-3">
+          <div className="px-3 py-1.5 text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+            Discover
+          </div>
+          {navItems.public.map((item) => (
+            <NavItem key={item.to} {...item} />
+          ))}
+        </div>
+
+        {isVerified && (
+          <div className="mb-3">
+            <div className="px-3 py-1.5 text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+              Workspace
+            </div>
+            {navItems.auth.map((item) => (
+              <NavItem key={item.to} {...item} />
+            ))}
+          </div>
+        )}
+
+        {!isVerified && (
+          <div className="mb-3">
+            <div className="px-3 py-1.5 text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
+              Account
+            </div>
+            {navItems.guest.map((item) => (
+              <NavItem key={item.to} {...item} />
+            ))}
+          </div>
+        )}
+      </nav>
+
+      <div className="p-3 border-t border-[var(--border)] space-y-2">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-all duration-150"
+        >
+          <Icon name={isDark ? "sun" : "moon"} className="w-4 h-4" />
+          <span>{isDark ? "Light mode" : "Dark mode"}</span>
+        </button>
+
+        {isVerified && (
+          <button
+            onClick={onLogout}
+            disabled={isLoading}
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger-muted)] transition-all duration-150 disabled:opacity-50"
+          >
+            <Icon name="logout" className="w-4 h-4" />
+            <span>{isLoading ? "Signing out..." : "Sign out"}</span>
+          </button>
+        )}
+      </div>
+    </aside>
+  );
+}
+
 export function AppShell({ children }) {
   const navigate = useNavigate();
   const { logout, isLoading, user, isVerified } = useAuth();
   const { toggle, isDark } = useTheme();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const onLogout = async () => {
     await logout();
@@ -121,100 +208,81 @@ export function AppShell({ children }) {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex">
-      <aside className="w-64 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col">
-        <div className="p-4 border-b border-[var(--border)]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-[var(--accent)] flex items-center justify-center">
-              <span className="text-xs font-bold text-white">SV</span>
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-[var(--text)]">
-                SnippetVault
-              </div>
-              <div className="text-xs text-[var(--muted)]">
-                {user?.username ? `@${user.username}` : "Code snippets"}
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Desktop sidebar */}
+      <div className="hidden md:block w-64 shrink-0">
+        <SidebarPanel
+          className="w-64 h-screen sticky top-0"
+          user={user}
+          isVerified={isVerified}
+          isLoading={isLoading}
+          isDark={isDark}
+          toggleTheme={toggle}
+          onLogout={onLogout}
+        />
+      </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          <div className="mb-3">
-            <div className="px-3 py-1.5 text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
-              Discover
-            </div>
-            {navItems.public.map((item) => (
-              <NavItem key={item.to} {...item} />
-            ))}
-          </div>
-
-          {isVerified && (
-            <div className="mb-3">
-              <div className="px-3 py-1.5 text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
-                Workspace
-              </div>
-              {navItems.auth.map((item) => (
-                <NavItem key={item.to} {...item} />
-              ))}
-            </div>
-          )}
-
-          {!isVerified && (
-            <div className="mb-3">
-              <div className="px-3 py-1.5 text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">
-                Account
-              </div>
-              {navItems.guest.map((item) => (
-                <NavItem key={item.to} {...item} />
-              ))}
-            </div>
-          )}
-        </nav>
-
-        <div className="p-3 border-t border-[var(--border)] space-y-2">
+      {/* Mobile drawer */}
+      {mobileSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-50">
           <button
             type="button"
-            onClick={toggle}
-            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] rounded-md hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-all duration-150"
-          >
-            <Icon
-              name={isDark ? "sun" : "moon"}
-              className="w-4 h-4"
+            aria-label="Close sidebar"
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-[320px]">
+            <SidebarPanel
+              className="w-full h-full"
+              user={user}
+              isVerified={isVerified}
+              isLoading={isLoading}
+              isDark={isDark}
+              toggleTheme={toggle}
+              onLogout={() => {
+                setMobileSidebarOpen(false);
+                onLogout();
+              }}
             />
-            <span>{isDark ? "Light mode" : "Dark mode"}</span>
-          </button>
-
-          {isVerified && (
-            <button
-              onClick={onLogout}
-              disabled={isLoading}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-[var(--danger)] rounded-md hover:bg-[var(--danger-muted)] transition-all duration-150 disabled:opacity-50"
-            >
-              <Icon name="logout" className="w-4 h-4" />
-              <span>{isLoading ? "Signing out..." : "Sign out"}</span>
-            </button>
-          )}
+          </div>
         </div>
-      </aside>
+      )}
 
       <main className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 px-6 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between gap-4">
-          <div className="text-sm text-[var(--muted)]">
-            Store, organize, and share your code snippets
+        <header className="h-14 px-4 sm:px-6 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              className="md:hidden btn btn-secondary w-10 h-9 p-0"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 16 16"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M2 4h12M2 8h12M2 12h12" />
+              </svg>
+            </button>
+            <div className="text-sm text-[var(--muted)] truncate">
+              Store, organize, and share your code snippets
+            </div>
           </div>
+
           <button
             type="button"
-            onClick={() =>
-              isVerified ? navigate("/dashboard/create") : navigate("/login")
-            }
+            onClick={() => (isVerified ? navigate("/dashboard/create") : navigate("/login"))}
             className="btn btn-primary"
           >
             <Icon name="plus" className="w-4 h-4" />
-            New Snippet
+            <span className="hidden sm:inline">New Snippet</span>
+            <span className="sm:hidden">New</span>
           </button>
         </header>
 
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
           <div className="fade-in">{children}</div>
         </div>
       </main>
