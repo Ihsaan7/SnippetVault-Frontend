@@ -31,13 +31,15 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await apiConfig.post("/auth/register", formData);
-      if (response && response.data && response.data.data.user) {
-        setUser(response.data.data.user);
+
+      // Backend returns { data: { user: {...} } }
+      // (Older builds returned { data: {...} }) so we support both.
+      const nextUser = response?.data?.data?.user || response?.data?.data;
+
+      if (nextUser) {
+        setUser(nextUser);
         setIsVerified(true);
-        localStorage.setItem(
-          "sv_user",
-          JSON.stringify(response.data.data.user)
-        );
+        localStorage.setItem("sv_user", JSON.stringify(nextUser));
       }
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -76,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
 
     try {
-      await apiConfig.post("auth/logout");
+      await apiConfig.post("/auth/logout");
       setUser(null);
       setIsVerified(false);
       localStorage.removeItem("sv_user");
