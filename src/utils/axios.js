@@ -2,7 +2,24 @@ import axios from "axios";
 
 const apiConfig = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/api/v1",
+  // NOTE: Cookies are often blocked cross-site on Vercel domains.
+  // We primarily use Authorization header tokens for deployed env.
   withCredentials: true,
+});
+
+apiConfig.interceptors.request.use((config) => {
+  try {
+    const token = localStorage.getItem("sv_access_token");
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
+  } catch {
+    // ignore
+  }
+  return config;
 });
 
 apiConfig.interceptors.response.use(

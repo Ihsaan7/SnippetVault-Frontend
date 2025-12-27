@@ -22,6 +22,18 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("sv_user");
       }
     }
+
+    // token used for Authorization header (deploy-safe)
+    try {
+      const token = localStorage.getItem("sv_access_token");
+      if (token) {
+        // keep isVerified true only if we also have a token
+        setIsVerified(true);
+      }
+    } catch {
+      // ignore
+    }
+
     setIsLoading(false);
   }, []);
 
@@ -32,14 +44,20 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await apiConfig.post("/auth/register", formData);
 
-      // Backend returns { data: { user: {...} } }
+      // Backend returns { data: { user, accessToken, refreshToken } }
       // (Older builds returned { data: {...} }) so we support both.
-      const nextUser = response?.data?.data?.user || response?.data?.data;
+      const data = response?.data?.data;
+      const nextUser = data?.user || data;
+      const accessToken = data?.accessToken;
 
       if (nextUser) {
         setUser(nextUser);
         setIsVerified(true);
         localStorage.setItem("sv_user", JSON.stringify(nextUser));
+      }
+
+      if (accessToken) {
+        localStorage.setItem("sv_access_token", accessToken);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -56,13 +74,18 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await apiConfig.post("/auth/login", formData);
-      if (response && response.data && response.data.data.user) {
-        setUser(response.data.data.user);
+      const data = response?.data?.data;
+      const nextUser = data?.user;
+      const accessToken = data?.accessToken;
+
+      if (nextUser) {
+        setUser(nextUser);
         setIsVerified(true);
-        localStorage.setItem(
-          "sv_user",
-          JSON.stringify(response.data.data.user)
-        );
+        localStorage.setItem("sv_user", JSON.stringify(nextUser));
+      }
+
+      if (accessToken) {
+        localStorage.setItem("sv_access_token", accessToken);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login Failed");
@@ -82,6 +105,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setIsVerified(false);
       localStorage.removeItem("sv_user");
+      localStorage.removeItem("sv_access_token");
     } catch (err) {
       setError(err.response?.data?.message || "Logout Failed");
       console.error("FRONTEND_LOGOUT!!!");
