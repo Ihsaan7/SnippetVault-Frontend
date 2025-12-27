@@ -11,6 +11,7 @@ export function RegisterationForm() {
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarError, setAvatarError] = useState("");
   const { isLoading, register, error } = useAuth();
   const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ export function RegisterationForm() {
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAvatarError("");
       setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setAvatarPreview(reader.result);
@@ -34,20 +36,24 @@ export function RegisterationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Client-side validation so we show a proper UI error instead of
+    // the browser's "invalid form control is not focusable" warning.
+    if (!avatarFile) {
+      setAvatarError("Please choose an avatar image.");
+      return;
+    }
+
     const submitData = new FormData();
     submitData.append("username", formData.username);
     submitData.append("email", formData.email);
     submitData.append("password", formData.password);
     submitData.append("fullName", formData.fullName);
-    if (avatarFile) {
-      submitData.append("avatar", avatarFile);
-    }
+    submitData.append("avatar", avatarFile);
 
     await register(submitData);
 
-    if (!error) {
-      navigate("/dashboard");
-    }
+    // NOTE: error is async state; navigation is handled best-effort here.
+    if (!error) navigate("/dashboard");
   };
 
   return (
@@ -67,6 +73,12 @@ export function RegisterationForm() {
 
         <div className="card p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {(avatarError || error) && (
+              <div className="p-3 rounded-md bg-[var(--danger-muted)] border border-[var(--danger)] text-sm text-[var(--danger)]">
+                {avatarError || error}
+              </div>
+            )}
+
             <div className="flex justify-center mb-2">
               <label className="relative cursor-pointer group">
                 <div className="w-20 h-20 rounded-full border-2 border-dashed border-[var(--border)] bg-[var(--surface-2)] flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:border-[var(--accent)] group-hover:bg-[var(--accent-subtle)]">
@@ -90,10 +102,10 @@ export function RegisterationForm() {
                 </div>
                 <input
                   type="file"
+                  name="avatar"
                   accept="image/*"
                   onChange={handleAvatarChange}
                   className="hidden"
-                  required
                   disabled={isLoading}
                 />
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs text-[var(--muted)] whitespace-nowrap">
@@ -185,11 +197,6 @@ export function RegisterationForm() {
               />
             </div>
 
-            {error && (
-              <div className="p-3 rounded-md bg-[var(--danger-muted)] border border-[var(--danger)] text-sm text-[var(--danger)]">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
