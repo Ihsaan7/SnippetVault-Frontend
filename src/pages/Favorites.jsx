@@ -32,7 +32,7 @@ export function Favorites() {
         </div>
         <button
           onClick={() => navigate("/dashboard/snippets")}
-          className="btn btn-secondary"
+          className="btn btn-secondary w-full sm:w-auto"
         >
           <svg
             className="w-4 h-4"
@@ -108,7 +108,7 @@ export function Favorites() {
       )}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1 || isLoading}

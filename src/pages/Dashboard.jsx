@@ -66,7 +66,7 @@ export function Dashboard() {
         </div>
         <button
           onClick={() => navigate("/dashboard/create")}
-          className="btn btn-primary"
+          className="btn btn-primary w-full sm:w-auto"
         >
           <svg
             className="w-4 h-4"
@@ -108,10 +108,10 @@ export function Dashboard() {
               Your most used programming languages
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap w-full sm:w-auto sm:justify-end">
             <button
               onClick={() => navigate("/dashboard/favorites")}
-              className="btn btn-secondary text-sm"
+              className="btn btn-secondary text-sm w-full sm:w-auto"
             >
               <svg
                 className="w-4 h-4"
@@ -126,7 +126,7 @@ export function Dashboard() {
             </button>
             <button
               onClick={() => navigate("/public/snippets")}
-              className="btn btn-secondary text-sm"
+              className="btn btn-secondary text-sm w-full sm:w-auto"
             >
               <svg
                 className="w-4 h-4"
